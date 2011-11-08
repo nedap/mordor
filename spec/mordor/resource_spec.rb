@@ -113,6 +113,21 @@ describe "with respect to resources" do
       res.first.should  == resource.first
       res.second.should == resource.second
     end
+
+    it "should be possible to retrieve all resources" do
+      TestResource.all.should_not be_nil
+      TestResource.all.size.should == 0
+
+      resource = TestResource.new({:first => "first", :second => "second"})
+      resource.save.should be_true
+      
+      resource2 = TestResource.new({:first => "first", :second => "second"})
+      resource2.save.should be_true
+
+      collection = TestResource.all
+      collection.should_not be_nil
+      collection.size.should == 2
+    end
   end
 
   context "with respect to collections" do

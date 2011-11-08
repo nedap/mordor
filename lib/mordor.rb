@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'mongo'
 require 'extlib'
+require 'json'
 require 'mordor/version'
 require 'mordor/collection'
 require 'mordor/resource'

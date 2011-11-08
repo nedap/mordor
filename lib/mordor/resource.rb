@@ -72,6 +72,10 @@ module Mordor
     end
 
     module ClassMethods
+      def all
+        Collection.new(self, collection.find)
+      end
+
       def collection
         connection.collection(self.collection_name)
       end

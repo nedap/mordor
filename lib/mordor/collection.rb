@@ -34,5 +34,16 @@ module Mordor
         super
       end
     end
+
+    def to_json
+      collection_name = @klass.collection_name.to_sym
+      res = {
+        collection_name => []
+      }
+      each do |elem|
+        res[collection_name] << elem.to_hash
+      end
+      res.to_json
+    end
   end
 end
