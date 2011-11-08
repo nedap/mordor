@@ -2,7 +2,7 @@ Gem::Specification.new do |s|
   s.name    = "mordor"
   
   # Do not set the version and date field manually, this is done by the release script
-  s.version = "0.1.0"
+  s.version = "0.1.1"
   s.date    = "2011-11-08"
 
   s.summary     = "mordor"
@@ -30,6 +30,6 @@ Gem::Specification.new do |s|
 
   # The files and test_files directives are set automatically by the release script.
   # Do not change them by hand, but make sure to add the files to the git repository.
-  s.files = %w(.gitignore Gemfile README Rakefile lib/mordor.rb lib/mordor/collection.rb lib/mordor/resource.rb lib/mordor/version.rb mordor.gemspec spec/mordor/connection_spec.rb spec/mordor/resource_spec.rb spec/spec.opts spec/spec_helper.rb tasks/github-gem.rake)
+  s.files = %w(.gitignore Gemfile Gemfile.lock README Rakefile lib/mordor.rb lib/mordor/collection.rb lib/mordor/resource.rb lib/mordor/version.rb mordor.gemspec spec/mordor/collection_spec.rb spec/mordor/connection_spec.rb spec/mordor/resource_spec.rb spec/spec.opts spec/spec_helper.rb tasks/github-gem.rake)
 end
 
