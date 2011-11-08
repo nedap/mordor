@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rake')
   s.add_development_dependency('ruby-debug')
   s.add_development_dependency('rspec', '~> 2.0')
+  s.add_development_dependency('json')
 
   s.add_development_dependency('extlib')
   s.add_development_dependency('mongo')
@@ -21,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency('extlib')
   s.add_runtime_dependency('mongo')
   s.add_runtime_dependency('bson_ext')
+  s.add_runtime_dependency('json')
 
   s.authors  = ['Jan-Willem Koelewijn', 'Dirkjan Bussink']
   s.email    = ['janwillem.koelewijn@nedap.com', 'dirkjan.bussink@nedap.com']
