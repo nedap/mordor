@@ -1,9 +1,9 @@
 require 'rubygems'
 require 'mongo'
 require 'extlib'
-require 'auditing/version'
-require 'auditing/collection'
-require 'auditing/resource'
+require 'mordor/version'
+require 'mordor/collection'
+require 'mordor/resource'
 
 unless Object.const_defined?('BigDecimal')
   BigDecimal = Float

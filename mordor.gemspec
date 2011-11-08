@@ -28,6 +28,6 @@ Gem::Specification.new do |s|
 
   # The files and test_files directives are set automatically by the release script.
   # Do not change them by hand, but make sure to add the files to the git repository.
-  s.files = %w(.gitignore Gemfile Gemfile.lock Rakefile auditing.gemspec lib/auditing.rb lib/auditing/collection.rb lib/auditing/modification.rb lib/auditing/request.rb lib/auditing/resource.rb lib/auditing/version.rb spec/auditing/connection_spec.rb spec/auditing/modification_spec.rb spec/auditing/request_spec.rb spec/auditing/resource_spec.rb spec/spec.opts spec/spec_helper.rb tasks/github-gem.rake)
+  s.files = %w(Rakefile lib/mordor.rb lib/mordor/collection.rb lib/mordor/resource.rb lib/mordor/version.rb mordor.gemspec spec/mordor/connection_spec.rb spec/mordor/resource_spec.rb spec/spec.opts spec/spec_helper.rb tasks/github-gem.rake)
 end
 
