@@ -7,12 +7,6 @@ describe "with respect to resources" do
     attribute :first
     attribute :second
     attribute :third, :finder_method => :find_by_third_attribute
-
-    def initialize(options = {})
-      options.each do |k, v|
-        self.send("#{k}=", v)
-      end
-    end
   end
 
   it "should create accessor methods for all attributes" do

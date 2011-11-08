@@ -6,6 +6,12 @@ module Mordor
       base.extend(ClassMethods)
     end
 
+    def initialize(attributes = {})
+      attributes.each do |k,v|
+        self.send("#{k}=", v)
+      end
+    end
+
     def replace_params(params = {})
       result = {}
       return result unless params
