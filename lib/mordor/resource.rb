@@ -79,7 +79,11 @@ module Mordor
         if id.is_a?(String)
           id = BSON::ObjectId.from_string(id)
         end
-        new(collection.find_one(:_id => id))
+        if attributes = collection.find_one(:_id => id)
+          new(attributes)
+        else
+          nil
+        end
       end
 
       def connection

@@ -130,4 +130,17 @@ describe "with respect to resources" do
       TestResource.connection.should_not be_nil
     end
   end
+
+  context "with respect to not finding something" do
+    it "should just return an empty collection when a collection query doesn't return results" do
+      col = TestResource.find_by_day(DateTime.civil(2011, 11, 8))
+      col.size.should == 0
+    end
+
+    it "should return nil when an non existing id is queried" do
+      clean_sheet
+      resource = TestResource.find_by_id('4eb8f3570e02e10cce000002')
+      resource.should be_nil
+    end
+  end
 end
