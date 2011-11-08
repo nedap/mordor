@@ -1,0 +1,126 @@
+module Mordor
+  module Resource
+    attr_accessor :_id
+
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
+
+    def replace_params(params = {})
+      result = {}
+      return result unless params
+      params.each do |key, value|
+        value = replace_type(value)
+        key = key.to_s.gsub(/\W|\./, "_")
+        result[key] = value
+      end
+      result
+    end
+
+    def replace_type(value)
+      case value
+      when Hash
+        value = replace_params(value)
+      when Date, DateTime
+        value = value.to_time
+      when BigDecimal
+        value = value.to_f
+      when Array
+        value = value.map do |val|
+          replace_type(val)
+        end
+      when Integer
+      else
+        value = value.to_s
+      end
+      value
+    end
+
+    def save
+      unless self._id
+        insert_id = self.class.collection.insert(self.to_hash)
+        self._id = insert_id
+      else
+        insert_id = self.update
+      end
+      insert_id != nil
+    end
+
+    def update
+      insert_id = self.class.collection.update({:_id => self._id}, self.to_hash)
+      insert_id
+    end
+
+    def collection
+      self.class.collection
+    end
+
+    def to_hash
+      attributes = self.class.instance_variable_get(:@attributes)
+      result = {}
+      return result unless attributes
+      attributes.each do |attribute_name|
+        result[attribute_name] = replace_type(self.send(attribute_name))
+      end
+      result
+    end
+
+    module ClassMethods
+      def collection
+        connection.collection(self.collection_name)
+      end
+
+      def collection_name
+        klassname = self.to_s.downcase.gsub(/[\/|.|::]/, '_')
+        "#{klassname}s"
+      end
+
+      def get(id)
+        if id.is_a?(String)
+          id = BSON::ObjectId.from_string(id)
+        end
+        new(collection.find_one(:_id => id))
+      end
+
+      def connection
+        @connection ||= Mordor.connection
+      end
+
+      def find_by_id(id)
+        get(id)
+      end
+
+      def find_by_day(day)
+        case day
+        when DateTime
+          start = day.to_date.to_time
+          end_of_day = (day.to_date + 1).to_time
+        when Date
+          start = day.to_time
+          end_of_day = (day + 1).to_time
+        when Time
+          start = day.to_datetime.to_date.to_time
+          end_of_day = (day.to_date + 1).to_datetime.to_date.to_time
+        end
+        cursor = collection.find(:at => {'$gte' => start, '$lt' => end_of_day})
+        Collection.new(self, cursor)
+      end
+
+      def attribute(name, options = {})
+        @attributes ||= []
+        @attributes << name unless @attributes.include?(name)
+
+        method_name = options.key?(:finder_method) ? options[:finder_method] : "find_by_#{name}"
+
+
+        class_eval <<-EOS, __FILE__, __LINE__
+          attr_accessor name
+
+          def self.#{method_name}(value)
+            Collection.new(self, collection.find(:#{name} => value))
+          end
+        EOS
+      end
+    end
+  end
+end
