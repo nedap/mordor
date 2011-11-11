@@ -128,6 +128,21 @@ describe "with respect to resources" do
       collection.should_not be_nil
       collection.size.should == 2
     end
+
+    it "should be possible to limit the number of returned resources" do
+      TestResource.all.should_not be_nil
+      TestResource.all.size.should == 0
+
+      resource = TestResource.new({:first => "first", :second => "second"})
+      resource.save.should be_true
+      
+      resource2 = TestResource.new({:first => "first", :second => "second"})
+      resource2.save.should be_true
+
+      collection = TestResource.all(:limit => 1)
+      collection.should_not be_nil
+      collection.size.should == 1
+    end
   end
 
   context "with respect to collections" do

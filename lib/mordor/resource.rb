@@ -72,8 +72,8 @@ module Mordor
     end
 
     module ClassMethods
-      def all
-        Collection.new(self, collection.find)
+      def all(options = {})
+        Collection.new(self, collection.find({}, options).to_a)
       end
 
       def collection
@@ -116,6 +116,8 @@ module Mordor
           start = day.to_datetime.to_date.to_time
           end_of_day = (day.to_date + 1).to_datetime.to_date.to_time
         end
+        hash = {:at => {'$gte' => start, '$lt' => end_of_day}}
+        pp hash
         cursor = collection.find(:at => {'$gte' => start, '$lt' => end_of_day})
         Collection.new(self, cursor)
       end
