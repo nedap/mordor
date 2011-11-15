@@ -4,7 +4,7 @@ require 'mongo'
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 require 'mordor'
 
-module Auditing
+module Mordor
 CONFIG = {
   :hostname => 'localhost',
   :port     =>  27017,
@@ -15,8 +15,11 @@ end
 def clean_sheet
   @connection ||= Mongo::Connection.new(Mordor::CONFIG[:hostname], Mordor::CONFIG[:port])
   @db ||= @connection[Mordor::CONFIG[:database]]
-  if Object.const_defined?('TestResource')
-    @db[TestResource.collection_name].drop
+
+  ['TestResource', 'TestTimedResource'].each do |resource|
+    if Object.const_defined?(resource)
+      @db[Object.const_get(resource).collection_name].drop
+    end
   end
 end
 

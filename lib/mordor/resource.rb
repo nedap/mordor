@@ -42,6 +42,14 @@ module Mordor
       value
     end
 
+    def new?
+      return self._id == nil
+    end
+
+    def saved?
+      return !new?
+    end
+
     def save
       unless self._id
         insert_id = self.class.collection.insert(self.to_hash)
@@ -49,8 +57,10 @@ module Mordor
       else
         insert_id = self.update
       end
-      insert_id != nil
+      saved?
     end
+
+    alias_method :save!, :save
 
     def update
       insert_id = self.class.collection.update({:_id => self._id}, self.to_hash)
@@ -72,6 +82,12 @@ module Mordor
     end
 
     module ClassMethods
+      def create(attributes = {})
+        resource = self.new(attributes)
+        resource.save
+        resource
+      end
+
       def all(options = {})
         Collection.new(self, collection.find({}, options).to_a)
       end
@@ -104,7 +120,11 @@ module Mordor
         get(id)
       end
 
-      def find_by_day(day)
+      def find(query, options = {})
+        Collection.new(self, collection.find(query, options).to_a)
+      end
+
+      def find_by_day(day, options = {})
         case day
         when DateTime
           start = day.to_date.to_time
@@ -117,8 +137,11 @@ module Mordor
           end_of_day = (day.to_date + 1).to_datetime.to_date.to_time
         end
         hash = {:at => {'$gte' => start, '$lt' => end_of_day}}
-        pp hash
-        cursor = collection.find(:at => {'$gte' => start, '$lt' => end_of_day})
+        if options.keys.include?(:limit)
+          cursor = collection.find({:at => {'$gte' => start, '$lt' => end_of_day}}, options).to_a
+        else
+          cursor = collection.find({:at => {'$gte' => start, '$lt' => end_of_day}})
+        end
         Collection.new(self, cursor)
       end
 
@@ -132,8 +155,13 @@ module Mordor
         class_eval <<-EOS, __FILE__, __LINE__
           attr_accessor name
 
-          def self.#{method_name}(value)
-            Collection.new(self, collection.find(:#{name} => value))
+          def self.#{method_name}(value, options = {})
+            if options.keys.include?(:limit)
+              col = collection.find({:#{name} => value}, options).to_a
+            else
+              col = collection.find(:#{name} => value)
+            end
+            Collection.new(self, col)
           end
         EOS
       end

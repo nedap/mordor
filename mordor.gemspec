@@ -11,7 +11,6 @@ Gem::Specification.new do |s|
   eos
 
   s.add_development_dependency('rake')
-  s.add_development_dependency('ruby-debug')
   s.add_development_dependency('rspec', '~> 2.0')
   s.add_development_dependency('json')
 

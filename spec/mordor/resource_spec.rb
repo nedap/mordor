@@ -63,7 +63,27 @@ describe "with respect to resources" do
       hash.size.should     == 3
       hash[:first].should  == "first"
       hash[:second].should == "second"
-      hash[:third].should  == "third" 
+      hash[:third].should  == "third"
+    end
+  end
+
+  context "with respect to creating" do
+    before :each do
+      clean_sheet
+      @resource = TestResource.create({:first => "first", :second => "second", :third => "third"})
+    end
+
+    it "should be possible to create a resource" do
+      @resource.should be_saved
+    end
+
+    it "should be possible to retrieve created resources" do
+      res = TestResource.get(@resource._id)
+      res.should_not be_nil
+      res.first.should eql @resource.first
+      res.second.should eql @resource.second
+      res.third.should eql @resource.third
+      res._id.should eql @resource._id
     end
   end
 
@@ -114,13 +134,41 @@ describe "with respect to resources" do
       res.second.should == resource.second
     end
 
+    it "should be possible to find resources using queries" do
+      resource = TestResource.new({:first => "first", :second => "second"})
+      resource.save.should be_true
+
+      resource2 = TestResource.new({:first => "first", :second => "2nd"})
+      resource2.save.should be_true
+
+      collection = TestResource.find({:first => "first"})
+      collection.should_not be_nil
+      collection.size.should == 2
+
+      collection = TestResource.find({:second => "2nd"})
+      collection.should_not be_nil
+      collection.size.should == 1
+    end
+
+    it "should be possible to query with a limit" do
+      resource = TestResource.new({:first => "first", :second => "second"})
+      resource.save.should be_true
+
+      resource2 = TestResource.new({:first => "first", :second => "2nd"})
+      resource2.save.should be_true
+
+      collection = TestResource.find({:first => "first"}, :limit => 1)
+      collection.should_not be_nil
+      collection.size.should == 1
+    end
+
     it "should be possible to retrieve all resources" do
       TestResource.all.should_not be_nil
       TestResource.all.size.should == 0
 
       resource = TestResource.new({:first => "first", :second => "second"})
       resource.save.should be_true
-      
+
       resource2 = TestResource.new({:first => "first", :second => "second"})
       resource2.save.should be_true
 
@@ -135,7 +183,7 @@ describe "with respect to resources" do
 
       resource = TestResource.new({:first => "first", :second => "second"})
       resource.save.should be_true
-      
+
       resource2 = TestResource.new({:first => "first", :second => "second"})
       resource2.save.should be_true
 
@@ -144,6 +192,34 @@ describe "with respect to resources" do
       collection.size.should == 1
     end
   end
+
+  context "with respect to retrieving by day" do
+    class TestTimedResource
+      include Mordor::Resource
+
+      attribute :first
+      attribute :at
+    end
+
+    before :each do
+      clean_sheet
+    end
+
+    it "should be possible to retrieve a Resource by day" do
+      TestTimedResource.create({:first => "hallo", :at => DateTime.civil(2011, 11, 11, 11, 11)})
+
+      col = TestTimedResource.find_by_day(DateTime.civil(2011,11,11))
+      col.size.should == 1
+      col.first.first.should eql "hallo"
+    end
+
+    it "should not retrieve resources from other days" do
+      TestTimedResource.create({:first => "hallo", :at => DateTime.civil(2011, 11, 11, 11, 11)})
+
+      col = TestTimedResource.find_by_day(DateTime.civil(2011,11,10))
+      col.size.should == 0
+    end
+ end
 
   context "with respect to collections" do
     it "should correctly return a collection name" do
@@ -167,4 +243,6 @@ describe "with respect to resources" do
       resource.should be_nil
     end
   end
+
+
 end

@@ -7,20 +7,40 @@ module Mordor
       @cursor = cursor
     end
 
+    def to_a
+      array = []
+      unless @cursor.is_a? Array
+        @cursor.each do |element|
+          if element.is_a? @klass
+            array << element
+          else
+            array << @klass.new(element)
+          end
+        end
+      else
+        array = @cursor.dup
+      end
+      array
+    end
+
     def each
       @cursor.each do |element|
-        if element
-          yield @klass.new(element)
+        if element.is_a? @klass
+          yield element
         else
-          next
+          yield @klass.new(element)
         end
       end
     end
 
     def first
-      result = @cursor.first
-      @cursor.rewind!
-      result ? @klass.new(result) : nil
+      if @cursor.is_a? Array
+        @cursor.first ? @klass.new(@cursor.first) : nil
+      else
+        result = @cursor.first
+        @cursor.rewind!
+        result ? @klass.new(result) : nil
+      end
     end
 
     def size
@@ -44,6 +64,18 @@ module Mordor
         res[collection_name] << elem.to_hash
       end
       res.to_json
+    end
+
+    def merge(other_collection)
+      Collection.new(@klass, (self.to_a + other_collection.to_a))
+    end
+    alias_method :+, :merge
+
+    def merge!(other_collection)
+      unless @cursor.is_a? Array
+        @cursor = @cursor.to_a
+      end
+      @cursor += other_collection.to_a
     end
   end
 end
