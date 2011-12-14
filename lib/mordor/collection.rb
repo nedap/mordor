@@ -32,6 +32,7 @@ module Mordor
           yield @klass.new(element)
         end
       end
+      @cursor.rewind! unless @cursor.is_a? Array
     end
 
     def first

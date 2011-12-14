@@ -47,19 +47,29 @@ describe "with respect to collections" do
     end
 
     it "should be possible to convert a collection to an array" do
-      collection = TestResource.all
+      collection = TestResource.find_by_first("1_first")
       collection.to_a.should be_a Array
     end
 
+    it "should be possible to convert multiple times after iterating using each" do
+      collection = TestResource.find_by_first("1_first")
+      collection.each do |resource|
+        resource.first
+      end
+      array1 = collection.to_a
+      array2 = collection.to_a
+      array1.size.should == array2.size
+    end
+
     it "should be possible to convert a collection to an array multiple times" do
-      collection = TestResource.all
+      collection = TestResource.find_by_first("1_first")
       array1 = collection.to_a
       array2 = collection.to_a
       array1.size.should == array2.size
     end
 
     it "should convert the collection to an array with the same size" do
-      collection = TestResource.all
+      collection = TestResource.find_by_first("1_first")
       collection_size = collection.size
       collection.to_a.size.should == collection_size
     end
