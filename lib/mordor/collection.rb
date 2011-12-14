@@ -17,6 +17,7 @@ module Mordor
             array << @klass.new(element)
           end
         end
+        @cursor.rewind!
       else
         array = @cursor.dup
       end

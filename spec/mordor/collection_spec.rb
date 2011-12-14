@@ -36,6 +36,35 @@ describe "with respect to collections" do
     end
   end
 
+  describe "converting to array" do
+    before :all do
+      clean_sheet
+
+      5.times do |index|
+        res = TestResource.new(:first => "#{index}_first", :second => "#{index}_second", :third => "#{index}_third")
+        res.save.should be_true
+      end
+    end
+
+    it "should be possible to convert a collection to an array" do
+      collection = TestResource.all
+      collection.to_a.should be_a Array
+    end
+
+    it "should be possible to convert a collection to an array multiple times" do
+      collection = TestResource.all
+      array1 = collection.to_a
+      array2 = collection.to_a
+      array1.size.should == array2.size
+    end
+
+    it "should convert the collection to an array with the same size" do
+      collection = TestResource.all
+      collection_size = collection.size
+      collection.to_a.size.should == collection_size
+    end
+  end
+
   describe "merging array based collection" do
     before :each do
       @first_collection  = Mordor::Collection.new(TestResource, [TestResource.new(:first => "first", :second => "second", :third => "third")])
