@@ -28,11 +28,7 @@ describe "with respect to collections" do
 
       json_collection = JSON.parse(json_collection)
 
-      collection_name = TestResource.collection_name.to_sym.to_s
-      json_collection.keys.should include collection_name
-      json_collection[collection_name].should_not be_nil
-      json_collection[collection_name].should be_a Array
-      json_collection[collection_name].size.should == 5
+      json_collection.size.should == 5
     end
   end
 
