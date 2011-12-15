@@ -7,23 +7,6 @@ module Mordor
       @cursor = cursor
     end
 
-    def to_a
-      array = []
-      unless @cursor.is_a? Array
-        @cursor.each do |element|
-          if element.is_a? @klass
-            array << element
-          else
-            array << @klass.new(element)
-          end
-        end
-        @cursor.rewind!
-      else
-        array = @cursor.dup
-      end
-      array
-    end
-
     def each
       @cursor.each do |element|
         if element.is_a? @klass
@@ -33,16 +16,6 @@ module Mordor
         end
       end
       @cursor.rewind! unless @cursor.is_a? Array
-    end
-
-    def first
-      if @cursor.is_a? Array
-        @cursor.first ? @klass.new(@cursor.first) : nil
-      else
-        result = @cursor.first
-        @cursor.rewind!
-        result ? @klass.new(result) : nil
-      end
     end
 
     def size
@@ -57,15 +30,9 @@ module Mordor
       end
     end
 
-    def to_json
-      collection_name = @klass.collection_name.to_sym
-      res = {
-        collection_name => []
-      }
-      each do |elem|
-        res[collection_name] << elem.to_hash
-      end
-      res.to_json
+
+    def to_json(*args)
+      to_a.to_json(*args)
     end
 
     def merge(other_collection)

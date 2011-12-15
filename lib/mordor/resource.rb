@@ -81,6 +81,10 @@ module Mordor
       result
     end
 
+    def to_json(*args)
+      to_hash.merge(:_id => _id).to_json(*args)
+    end
+
     module ClassMethods
       def create(attributes = {})
         resource = self.new(attributes)
