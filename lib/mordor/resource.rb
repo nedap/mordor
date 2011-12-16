@@ -28,7 +28,9 @@ module Mordor
       when Hash
         value = replace_params(value)
       when Date, DateTime
-        value = value.to_time
+        value = value.to_time.getlocal
+      when Time
+        value = value.getlocal
       when BigDecimal
         value = value.to_f
       when Array
