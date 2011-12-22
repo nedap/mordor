@@ -163,7 +163,7 @@ module Mordor
 
           def self.#{method_name}(value, options = {})
             if options.keys.include?(:limit)
-              col = collection.find({:#{name} => value}, options).to_a
+              col = collection.find({:#{name} => value}, options)
             else
               col = collection.find(:#{name} => value)
             end

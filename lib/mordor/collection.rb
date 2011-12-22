@@ -19,7 +19,7 @@ module Mordor
     end
 
     def size
-      @cursor.count
+      @cursor.is_a?(Array) ? @cursor.count : @cursor.count(true)
     end
 
     def method_missing(method, *args, &block)
