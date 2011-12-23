@@ -95,7 +95,7 @@ module Mordor
       end
 
       def all(options = {})
-        Collection.new(self, collection.find({}, options))
+        Collection.new(self, perform_collection_find({}, options))
       end
 
       def collection
@@ -111,7 +111,7 @@ module Mordor
         if id.is_a?(String)
           id = BSON::ObjectId.from_string(id)
         end
-        if attributes = collection.find_one(:_id => id)
+        if attributes = perform_collection_find_one(:_id => id)
           new(attributes)
         else
           nil
@@ -122,12 +122,16 @@ module Mordor
         @connection ||= Mordor.connection
       end
 
+      def indices
+        @indices || []
+      end
+
       def find_by_id(id)
         get(id)
       end
 
       def find(query, options = {})
-        Collection.new(self, collection.find(query, options))
+        Collection.new(self, perform_collection_find(query, options))
       end
 
       def find_by_day(day, options = {})
@@ -143,13 +147,17 @@ module Mordor
           end_of_day = (day.to_date + 1).to_datetime.to_date.to_time
         end
         hash = {:at => {'$gte' => start, '$lt' => end_of_day}}
-        cursor = collection.find({:at => {'$gte' => start, '$lt' => end_of_day}}, options)
+        cursor = perform_collection_find({:at => {'$gte' => start, '$lt' => end_of_day}}, options)
         Collection.new(self, cursor)
       end
 
+
       def attribute(name, options = {})
         @attributes ||= []
+        @indices    ||= []
+
         @attributes << name unless @attributes.include?(name)
+        @indices    << name if options[:index] && !@indices.include?(name) 
 
         method_name = options.key?(:finder_method) ? options[:finder_method] : "find_by_#{name}"
 
@@ -158,10 +166,25 @@ module Mordor
           attr_accessor name
 
           def self.#{method_name}(value, options = {})
-            col = collection.find({:#{name} => value}, options)
+            col = perform_collection_find({:#{name} => value}, options)
             Collection.new(self, col)
           end
         EOS
+      end
+
+      private
+      def perform_collection_find(query, options = {})
+        ensure_indices
+        collection.find(query, options)
+      end
+
+      def perform_collection_find_one(query, options = {})
+        ensure_indices
+        collection.find_one(query, options)
+      end
+
+      def ensure_indices
+        collection.ensure_index( indices.map{|index| [index.to_s, Mongo::DESCENDING]} ) if indices.any?
       end
     end
   end

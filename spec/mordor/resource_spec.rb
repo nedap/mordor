@@ -1,12 +1,22 @@
 require File.join(File.dirname(__FILE__), '..', '/spec_helper.rb')
 
 describe "with respect to resources" do
-  class TestResource
-    include Mordor::Resource
+  before :each do
+    class TestResource
+      include Mordor::Resource
 
-    attribute :first
-    attribute :second
-    attribute :third, :finder_method => :find_by_third_attribute
+      attribute :first, :index => true
+      attribute :second
+      attribute :third, :finder_method => :find_by_third_attribute
+
+      # Put this in here again to ensure the original method is still here
+      class_eval do
+        def self.ensure_indices
+          collection.ensure_index( indices.map{|index| [index.to_s, Mongo::DESCENDING]} ) if indices.any?
+        end
+
+      end
+    end
   end
 
   it "should create accessor methods for all attributes" do
@@ -21,6 +31,30 @@ describe "with respect to resources" do
 
   it "should create finder methods with the supplied finder method name" do
     TestResource.methods.should include "find_by_third_attribute"
+  end
+
+  it "should ensure indices when the option :index => true is given" do
+    TestResource.indices.should include :first
+  end
+
+  it "should call ensure_index on the collection for each index when a query is performed" do
+    TestResource.class_eval do
+      def self.ensure_count
+        @count ||= 0
+      end
+
+      def self.ensure_count=(val)
+        @count = val
+      end
+
+      private
+      def self.ensure_indices
+        self.ensure_count = self.ensure_count + 1
+      end
+    end
+    TestResource.create({:first => 'first', :second => 'second', :third => 'third'})
+    TestResource.all()
+    TestResource.ensure_count.should == 1
   end
 
   context "with respect to replacing params" do
