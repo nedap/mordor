@@ -71,6 +71,26 @@ describe "with respect to collections" do
     end
   end
 
+  describe "counting" do
+
+    before :all do
+      clean_sheet
+
+      5.times do |index|
+        res = TestResource.new(:first => "#{index}_first", :second => "#{index}_second", :third => "#{index}_third")
+        res.save.should be_true
+      end
+    end
+
+    it "should default to taking in account limits" do
+      TestResource.find({}, {:limit => 3}).count.should == 3
+    end
+
+    it "should not take in account limits and offsets when requested" do
+      TestResource.find({}, {:limit => 3}).count(false).should == 5
+    end
+  end
+
   describe "merging array based collection" do
     before :each do
       @first_collection  = Mordor::Collection.new(TestResource, [TestResource.new(:first => "first", :second => "second", :third => "third")])

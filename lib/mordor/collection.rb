@@ -18,9 +18,10 @@ module Mordor
       @cursor.rewind! unless @cursor.is_a? Array
     end
 
-    def size
-      @cursor.is_a?(Array) ? @cursor.count : @cursor.count(true)
+    def size(regard_limits_and_offsets = true)
+      @cursor.is_a?(Array) ? @cursor.count : @cursor.count(regard_limits_and_offsets)
     end
+    alias :count :size
 
     def method_missing(method, *args, &block)
       if @cursor.respond_to?(method)
@@ -29,7 +30,6 @@ module Mordor
         super
       end
     end
-
 
     def to_json(*args)
       to_a.to_json(*args)

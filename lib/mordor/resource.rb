@@ -95,7 +95,7 @@ module Mordor
       end
 
       def all(options = {})
-        Collection.new(self, collection.find({}, options).to_a)
+        Collection.new(self, collection.find({}, options))
       end
 
       def collection
@@ -127,7 +127,7 @@ module Mordor
       end
 
       def find(query, options = {})
-        Collection.new(self, collection.find(query, options).to_a)
+        Collection.new(self, collection.find(query, options))
       end
 
       def find_by_day(day, options = {})
@@ -143,11 +143,7 @@ module Mordor
           end_of_day = (day.to_date + 1).to_datetime.to_date.to_time
         end
         hash = {:at => {'$gte' => start, '$lt' => end_of_day}}
-        if options.keys.include?(:limit)
-          cursor = collection.find({:at => {'$gte' => start, '$lt' => end_of_day}}, options).to_a
-        else
-          cursor = collection.find({:at => {'$gte' => start, '$lt' => end_of_day}})
-        end
+        cursor = collection.find({:at => {'$gte' => start, '$lt' => end_of_day}}, options)
         Collection.new(self, cursor)
       end
 
@@ -162,11 +158,7 @@ module Mordor
           attr_accessor name
 
           def self.#{method_name}(value, options = {})
-            if options.keys.include?(:limit)
-              col = collection.find({:#{name} => value}, options)
-            else
-              col = collection.find(:#{name} => value)
-            end
+            col = collection.find({:#{name} => value}, options)
             Collection.new(self, col)
           end
         EOS
