@@ -86,8 +86,24 @@ describe "with respect to collections" do
       TestResource.find({}, {:limit => 3}).count.should == 3
     end
 
-    it "should not take in account limits and offsets when requested" do
+    it "should not take in account limits when requested" do
       TestResource.find({}, {:limit => 3}).count(false).should == 5
+    end
+
+    it "should not take in account skips when requested" do
+      TestResource.find({}, {:skip => 2}).count(false).should == 5
+    end
+
+    it "should not take in account skips and limits when requested" do
+      TestResource.find({}, {:skip => 1, :limit => 3}).count(false).should == 5
+    end
+
+    it "should take in account skips by defaults" do
+      TestResource.find({}, {:skip => 2}).count.should == 3
+    end
+
+    it "should take in account skips and limits by default" do
+      TestResource.find({}, {:skip => 1, :limit => 3}).count.should == 3
     end
   end
 
