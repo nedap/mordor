@@ -5,9 +5,9 @@ describe "with respect to resources" do
     class TestResource
       include Mordor::Resource
 
-      attribute :first, :index => true
-      attribute :second
-      attribute :third, :finder_method => :find_by_third_attribute
+      attribute :first,  :index => true
+      attribute :second, :index => true, :index_type => Mongo::ASCENDING
+      attribute :third,  :finder_method => :find_by_third_attribute
 
       # Put this in here again to ensure the original method is still here
       class_eval do
@@ -34,7 +34,17 @@ describe "with respect to resources" do
   end
 
   it "should ensure indices when the option :index => true is given" do
-    TestResource.indices.should include :first
+    TestResource.send(:indices).should include :first
+  end
+
+  it "should default to descending indices" do
+    TestResource.send(:index_types).keys.should include :first
+    TestResource.send(:index_types)[:first].should == Mongo::DESCENDING
+  end
+
+  it "should be possible to set index type using the 'index_type' option" do
+    TestResource.send(:index_types).keys.should include :second
+    TestResource.send(:index_types)[:second].should == Mongo::ASCENDING
   end
 
   it "should call ensure_index on the collection for each index when a query is performed" do
@@ -48,8 +58,15 @@ describe "with respect to resources" do
       end
 
       private
+      def self.do_ensure_indices
+        indices.each do |index|
+          collection.ensure_index( [ [index.to_s, index_types[index]] ] )
+        end
+      end
+
       def self.ensure_indices
         self.ensure_count = self.ensure_count + 1
+        self.do_ensure_indices
       end
     end
     TestResource.create({:first => 'first', :second => 'second', :third => 'third'})

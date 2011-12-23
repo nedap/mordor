@@ -122,9 +122,6 @@ module Mordor
         @connection ||= Mordor.connection
       end
 
-      def indices
-        @indices || []
-      end
 
       def find_by_id(id)
         get(id)
@@ -153,11 +150,15 @@ module Mordor
 
 
       def attribute(name, options = {})
-        @attributes ||= []
-        @indices    ||= []
+        @attributes  ||= []
+        @indices     ||= []
+        @index_types ||= {}
 
         @attributes << name unless @attributes.include?(name)
-        @indices    << name if options[:index] && !@indices.include?(name) 
+        if options[:index]
+          @indices    << name unless @indices.include?(name)
+          @index_types[name] = options[:index_type] ? options[:index_type] : Mongo::DESCENDING
+        end
 
         method_name = options.key?(:finder_method) ? options[:finder_method] : "find_by_#{name}"
 
@@ -184,7 +185,17 @@ module Mordor
       end
 
       def ensure_indices
-        collection.ensure_index( indices.map{|index| [index.to_s, Mongo::DESCENDING]} ) if indices.any?
+        indices.each do |index|
+          collection.ensure_index( [ [index.to_s, index_types[index]] ] )
+        end
+      end
+
+      def indices
+        @indices ||= []
+      end
+
+      def index_types
+        @index_types ||= {}
       end
     end
   end

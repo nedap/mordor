@@ -4,9 +4,9 @@ describe "with respect to collections" do
   class TestResource
     include Mordor::Resource
 
-    attribute :first
-    attribute :second
-    attribute :third, :finder_method => :find_by_third_attribute
+    attribute :first,  :index => true
+    attribute :second, :index => true, :index_type => Mongo::ASCENDING
+    attribute :third,  :finder_method => :find_by_third_attribute
   end
 
   describe "serialization" do

@@ -16,4 +16,4 @@ This adds attr_accessors to the ExampleResource for each attribute, plus adds fi
 as can be seen with the third attribute.
 
 When the `:index => true` option is set, indices are ensured before each query on 
-the collection. At the moment all indices are descending. Support for options is in the works
+the collection. Indices are descending by default, but this can be changed by also supplying a `:index_type => Mongo::ASCENDING` option.
