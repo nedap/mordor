@@ -17,3 +17,6 @@ as can be seen with the third attribute.
 
 When the `:index => true` option is set, indices are ensured before each query on 
 the collection. Indices are descending by default, but this can be changed by also supplying a `:index_type => Mongo::ASCENDING` option.
+
+We are thinking about adding timestamps on creation as well, this will always be the first field to be inserted, using a Ruby variation of `{ts : new Timestamp()}`. 
+This will create BSON Timestamps on the resources, which can help when having some order in the resources is needed. 
