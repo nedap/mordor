@@ -162,12 +162,18 @@ module Mordor
 
         method_name = options.key?(:finder_method) ? options[:finder_method] : "find_by_#{name}"
 
-
         class_eval <<-EOS, __FILE__, __LINE__
           attr_accessor name
 
           def self.#{method_name}(value, options = {})
-            col = perform_collection_find({:#{name} => value}, options)
+            if value.is_a?(Hash)
+              raise ArgumentError.new(":value missing from complex query hash") unless value.keys.include?(:value)
+              query = {:#{name} => value.delete(:value)}
+              query = query.merge(value)
+            else
+              query = {:#{name} => value}
+            end
+            col = perform_collection_find(query, options)
             Collection.new(self, col)
           end
         EOS

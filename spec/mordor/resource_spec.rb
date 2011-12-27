@@ -242,6 +242,44 @@ describe "with respect to resources" do
       collection.should_not be_nil
       collection.size.should == 1
     end
+
+    describe "with respect to passing extra query parameters to finder methods" do
+      before :each do
+        5.times do |i|
+          TestResource.create({:first => "first", :second => "second-#{i}", :third => "third-#{i}"})
+        end
+      end
+
+      it "should raise an argument exception if the :value option is omitted from a complex finder query" do
+        collection = TestResource.find_by_first("first")
+        collection.size.should == 5
+
+        lambda{ TestResource.find_by_first({:second => "second-2"})}.should raise_error
+      end
+
+      it "should be possible to add extra query clauses to a finder method" do
+        collection = TestResource.find_by_first("first")
+        collection.size.should == 5
+
+        collection = TestResource.find_by_first({:value => "first", :second => "second-2"})
+        collection.size.should == 1
+        resource = collection.first
+        resource.first.should == "first"
+        resource.second.should == "second-2"
+      end
+
+      it "should be possible to add more complex query clauses to a finder method" do
+        collection = TestResource.find_by_first("first")
+        collection.size.should == 5
+
+        collection = TestResource.find_by_first({:value => "first", :second => {:$in => ["second-1", "second-2"]}})
+        collection.size.should == 2
+        collection.each do |res|
+          res.first.should == "first"
+          ["second-1", "second-2"].should include res.second
+        end
+      end
+    end
   end
 
   context "with respect to retrieving by day" do
