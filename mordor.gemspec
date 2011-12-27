@@ -2,8 +2,8 @@ Gem::Specification.new do |s|
   s.name    = "mordor"
   
   # Do not set the version and date field manually, this is done by the release script
-  s.version = "0.2.0"
-  s.date    = "2011-12-23"
+  s.version = "0.2.1"
+  s.date    = "2011-12-27"
 
   s.summary     = "mordor"
   s.description = <<-eos
