@@ -2,19 +2,20 @@ require File.join(File.dirname(__FILE__), '..', '/spec_helper.rb')
 
 describe "with respect to resources" do
   before :each do
+    Object.send(:remove_const, :TestResource) if Object.const_defined?(:TestResource)
     class TestResource
       include Mordor::Resource
 
       attribute :first,  :index => true
       attribute :second, :index => true, :index_type => Mongo::ASCENDING
       attribute :third,  :finder_method => :find_by_third_attribute
+      attribute :at,     :timestamp => true
 
       # Put this in here again to ensure the original method is still here
       class_eval do
         def self.ensure_indices
           collection.ensure_index( indices.map{|index| [index.to_s, Mongo::DESCENDING]} ) if indices.any?
         end
-
       end
     end
   end
@@ -49,6 +50,10 @@ describe "with respect to resources" do
 
   it "should call ensure_index on the collection for each index when a query is performed" do
     TestResource.class_eval do
+      def self.reset_ensure_count
+        @count = 0
+      end
+
       def self.ensure_count
         @count ||= 0
       end
@@ -70,8 +75,29 @@ describe "with respect to resources" do
       end
     end
     TestResource.create({:first => 'first', :second => 'second', :third => 'third'})
+    TestResource.reset_ensure_count
     TestResource.all()
     TestResource.ensure_count.should == 1
+  end
+
+  it "should be possible to designate an attribute as a timestamp" do
+    TestResource.timestamped_attribute.should_not be_nil
+    TestResource.timestamped_attribute.should == :at
+  end
+
+  it "should only be possible to have one attribute as a timestamp" do
+    lambda {
+      TestResource2.class_eval do
+        attribute :some_timestamp, :timestamp => true
+        attribute :another_timestamp, :timestamp => true
+      end
+    }.should raise_error
+  end
+
+  it "should provide timestamped attribute as first attribute when creating a Resource" do
+    tr = TestResource.create({:first => 'first'})
+    tr.at.should_not be_nil
+    TestResource.get(tr._id).at.should_not == BSON::Timestamp.new(0,0)
   end
 
   context "with respect to replacing params" do
@@ -111,7 +137,7 @@ describe "with respect to resources" do
     it "should correctly respond to to_hash" do
       resource = TestResource.new({:first => "first", :second => "second", :third => "third"})
       hash = resource.to_hash
-      hash.size.should     == 3
+      hash.size.should     == 4
       hash[:first].should  == "first"
       hash[:second].should == "second"
       hash[:third].should  == "third"

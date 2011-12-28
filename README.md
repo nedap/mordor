@@ -8,6 +8,7 @@ class ExampleResource
   attribute :first, :index => true
   attribute :second
   attribute :third, :finder_method => :find_by_third_attribute
+  attribute :at,    :timestamp => true
 end
 ```
 
@@ -18,5 +19,7 @@ as can be seen with the third attribute.
 When the `:index => true` option is set, indices are ensured before each query on 
 the collection. Indices are descending by default, but this can be changed by also supplying a `:index_type => Mongo::ASCENDING` option.
 
-We are thinking about adding timestamps on creation as well, this will always be the first field to be inserted, using a Ruby variation of `{ts : new Timestamp()}`. 
-This will create BSON Timestamps on the resources, which can help when having some order in the resources is needed. 
+At most one attribute per Resource can have the option `:timestamp => true` set. This means that the attribute will be saved as one of the two first 
+attributes (the other one being the `_id` attribute. When no value is given for the timestamped attribute, a timestamp with value 0 will be inserted,
+which results in a timestamp being assigned to it by the MongoDB.
+An exception is raised when more than one attribute is given the timestamp option

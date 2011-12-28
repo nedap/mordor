@@ -52,10 +52,29 @@ module Mordor
       return !new?
     end
 
+    def reload
+      return unless _id
+      res = self.class.get(_id).to_hash.each do |k, v|
+        self.send("#{k}=".to_sym, v)
+      end
+      self
+    end
+
     def save
       unless self._id
-        insert_id = self.class.collection.insert(self.to_hash)
+        self_hash = self.to_hash
+        if timestamp_attribute = self.class.timestamped_attribute
+          timestamp_value = self_hash.delete(timestamp_attribute)
+          ordered_self_hash = BSON::OrderedHash.new
+          ordered_self_hash[timestamp_attribute] = (timestamp_value.nil? || timestamp_value.empty?) ? BSON::Timestamp.new(0, 0) : timestamp_value
+          self_hash.each do |key, value|
+            ordered_self_hash[key] = value
+          end
+          self_hash = ordered_self_hash
+        end
+        insert_id = self.class.collection.insert(self_hash)
         self._id = insert_id
+        self.reload
       else
         insert_id = self.update
       end
@@ -148,6 +167,9 @@ module Mordor
         Collection.new(self, cursor)
       end
 
+      def timestamped_attribute
+        @timestamped_attribute
+      end
 
       def attribute(name, options = {})
         @attributes  ||= []
@@ -158,6 +180,11 @@ module Mordor
         if options[:index]
           @indices    << name unless @indices.include?(name)
           @index_types[name] = options[:index_type] ? options[:index_type] : Mongo::DESCENDING
+        end
+
+        if options[:timestamp]
+          raise ArgumentError.new("Only one timestamped attribute is allowed, '#{@timestamped_attribute}' is already timestamped") unless @timestamped_attribute.nil?
+          @timestamped_attribute = name
         end
 
         method_name = options.key?(:finder_method) ? options[:finder_method] : "find_by_#{name}"
