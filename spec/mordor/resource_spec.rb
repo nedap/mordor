@@ -134,6 +134,17 @@ describe "with respect to resources" do
       end
     end
 
+    it "should correctly replace BSON::Timestampls" do
+      options = {
+        "option" => BSON::Timestamp.new(324244, 12)
+      }
+      result = TestResource.new.replace_params(options)
+      result.each do |k, v|
+        v["seconds"].should == 324244
+        v["increment"].should == 12
+      end
+    end
+
     it "should correctly respond to to_hash" do
       resource = TestResource.new({:first => "first", :second => "second", :third => "third"})
       hash = resource.to_hash
@@ -142,6 +153,7 @@ describe "with respect to resources" do
       hash[:second].should == "second"
       hash[:third].should  == "third"
     end
+
   end
 
   context "with respect to creating" do

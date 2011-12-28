@@ -37,6 +37,8 @@ module Mordor
         value = value.map do |val|
           replace_type(val)
         end
+      when BSON::Timestamp
+        value = replace_params({:seconds => value.seconds, :increment => value.increment})
       when Integer
       else
         value = value.to_s
