@@ -14,7 +14,7 @@ module Mordor
 
     def replace_params(params = {})
       result = {}
-      return result unless params
+      return result if params.nil? or params.empty?
       params.each do |key, value|
         value = replace_type(value)
         key = key.to_s.gsub(/\W|\./, "_")
@@ -68,7 +68,7 @@ module Mordor
         if timestamp_attribute = self.class.timestamped_attribute
           timestamp_value = self_hash.delete(timestamp_attribute)
           if timestamp_value.is_a?(Hash)
-            timestamp_value = BSON::Timestamp.new(timestamp_value[:seconds], timestamp_value[:increment])
+            timestamp_value = BSON::Timestamp.new(timestamp_value["seconds"], timestamp_value["increment"])
           end
           ordered_self_hash = BSON::OrderedHash.new
           ordered_self_hash[timestamp_attribute] = (timestamp_value.nil?) ? BSON::Timestamp.new(0, 0) : timestamp_value
