@@ -96,6 +96,7 @@ describe "with respect to resources" do
 
   it "should provide timestamped attribute as first attribute when creating a Resource" do
     tr = TestResource.create({:first => 'first'})
+    tr.reload
     tr.at.should_not be_nil
     TestResource.get(tr._id).at.should_not == BSON::Timestamp.new(0,0)
   end

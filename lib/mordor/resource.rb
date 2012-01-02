@@ -38,7 +38,7 @@ module Mordor
           replace_type(val)
         end
       when BSON::Timestamp
-        value = replace_params({:seconds => value.seconds, :increment => value.increment})
+        value = replace_params({:seconds => value ? value.seconds : 0, :increment => value ? value.increment : 0})
       when Integer
       else
         value = value.to_s
@@ -67,8 +67,11 @@ module Mordor
         self_hash = self.to_hash
         if timestamp_attribute = self.class.timestamped_attribute
           timestamp_value = self_hash.delete(timestamp_attribute)
+          if timestamp_value.is_a?(Hash)
+            timestamp_value = BSON::Timestamp.new(timestamp_value[:seconds], timestamp_value[:increment])
+          end
           ordered_self_hash = BSON::OrderedHash.new
-          ordered_self_hash[timestamp_attribute] = (timestamp_value.nil? || timestamp_value.empty?) ? BSON::Timestamp.new(0, 0) : timestamp_value
+          ordered_self_hash[timestamp_attribute] = (timestamp_value.nil?) ? BSON::Timestamp.new(0, 0) : timestamp_value
           self_hash.each do |key, value|
             ordered_self_hash[key] = value
           end
@@ -76,7 +79,6 @@ module Mordor
         end
         insert_id = self.class.collection.insert(self_hash)
         self._id = insert_id
-        self.reload
       else
         insert_id = self.update
       end
