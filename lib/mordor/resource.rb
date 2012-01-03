@@ -71,7 +71,7 @@ module Mordor
             timestamp_value = BSON::Timestamp.new(timestamp_value["seconds"], timestamp_value["increment"])
           end
           ordered_self_hash = BSON::OrderedHash.new
-          ordered_self_hash[timestamp_attribute] = (timestamp_value.nil?) ? BSON::Timestamp.new(0, 0) : timestamp_value
+          ordered_self_hash[timestamp_attribute] = (timestamp_value.nil? || timestamp_value.empty?) ? BSON::Timestamp.new(0, 0) : timestamp_value
           self_hash.each do |key, value|
             ordered_self_hash[key] = value
           end
