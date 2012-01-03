@@ -82,6 +82,7 @@ module Mordor
       else
         insert_id = self.update
       end
+      self.class.send(:ensure_indices)
       saved?
     end
 
