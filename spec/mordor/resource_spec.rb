@@ -48,38 +48,6 @@ describe "with respect to resources" do
     TestResource.send(:index_types)[:second].should == Mongo::ASCENDING
   end
 
-  it "should call ensure_index on the collection for each index when a query is performed" do
-    TestResource.class_eval do
-      def self.reset_ensure_count
-        @count = 0
-      end
-
-      def self.ensure_count
-        @count ||= 0
-      end
-
-      def self.ensure_count=(val)
-        @count = val
-      end
-
-      private
-      def self.do_ensure_indices
-        indices.each do |index|
-          collection.ensure_index( [ [index.to_s, index_types[index]] ] )
-        end
-      end
-
-      def self.ensure_indices
-        self.ensure_count = self.ensure_count + 1
-        self.do_ensure_indices
-      end
-    end
-    TestResource.create({:first => 'first', :second => 'second', :third => 'third'})
-    TestResource.reset_ensure_count
-    TestResource.all()
-    TestResource.ensure_count.should == 1
-  end
-
   it "should be possible to designate an attribute as a timestamp" do
     TestResource.timestamped_attribute.should_not be_nil
     TestResource.timestamped_attribute.should == :at
@@ -155,6 +123,66 @@ describe "with respect to resources" do
       hash[:third].should  == "third"
     end
 
+  end
+
+  context "with respect to indices" do
+    before :each do
+      class TestResource2
+        include Mordor::Resource
+      end
+
+      [TestResource, TestResource2].each do |klass|
+        klass.class_eval do
+          def self.reset_ensure_count
+            @count = 0
+          end
+
+          def self.ensure_count
+            @count ||= 0
+          end
+
+          def self.ensure_count=(val)
+            @count = val
+          end
+
+          private
+          def self.do_ensure_indices
+            indices.each do |index|
+              do_ensure_index(index)
+            end
+          end
+
+          def self.do_ensure_index(attribute)
+            collection.ensure_index( [ [attribute.to_s, index_types[attribute]] ] )
+          end
+
+          def self.ensure_indices
+            self.ensure_count = self.ensure_count + 1
+            self.do_ensure_indices
+          end
+
+          def self.ensure_index(attribute)
+            self.ensure_count += 1
+            self.do_ensure_index(attribute)
+          end
+        end
+      end
+    end
+
+    it "should call ensure_index on the collection for each index when a query is performed" do
+      TestResource.create({:first => 'first', :second => 'second', :third => 'third'})
+      TestResource.reset_ensure_count
+      TestResource.all()
+      TestResource.ensure_count.should == 1
+    end
+
+    it "should call ensure index for each index attribute on creation" do
+      TestResource2.class_eval do
+        attribute :test_attribute, :index => true
+      end
+
+      TestResource2.ensure_count.should == 1
+    end
   end
 
   context "with respect to creating" do

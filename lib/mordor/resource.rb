@@ -82,7 +82,6 @@ module Mordor
       else
         insert_id = self.update
       end
-      self.class.send(:ensure_indices)
       saved?
     end
 
@@ -185,6 +184,7 @@ module Mordor
         if options[:index]
           @indices    << name unless @indices.include?(name)
           @index_types[name] = options[:index_type] ? options[:index_type] : Mongo::DESCENDING
+          ensure_index(name)
         end
 
         if options[:timestamp]
@@ -224,8 +224,12 @@ module Mordor
 
       def ensure_indices
         indices.each do |index|
-          collection.ensure_index( [ [index.to_s, index_types[index]] ] )
+          ensure_index(index)
         end
+      end
+
+      def ensure_index(attribute)
+        collection.ensure_index( [ [attribute.to_s, index_types[attribute] ]] )
       end
 
       def indices
