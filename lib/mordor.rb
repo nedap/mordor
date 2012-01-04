@@ -3,6 +3,7 @@ require 'mongo'
 require 'extlib'
 require 'json'
 require 'mordor/version'
+require 'mordor/config'
 require 'mordor/collection'
 require 'mordor/resource'
 
@@ -82,17 +83,10 @@ class Time
 end
 
 module Mordor
-  CONFIG = {
-    :hostname => 'localhost',
-    :port     => 27017,
-    :database => 'development'
-  }
-
   def connection
-    @connection ||= Mongo::Connection.new(CONFIG[:hostname], CONFIG[:port])
-    @connection.autenticate(CONFIG[:username], CONFIG[:password]) if CONFIG[:username]
-    @connection.db(CONFIG[:database])
+    @connection ||= Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port])
+    @connection.autenticate(Mordor::Config[:username], Mordor::Config[:password]) if Mordor::Config[:username]
+    @connection.db(Mordor::Config[:database])
   end
   module_function :connection
-
 end

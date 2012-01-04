@@ -11,6 +11,6 @@ describe "connecting to mongo" do
   end
 
   it "should select the correct database" do
-    @db.name.should == Mordor::CONFIG[:database]
+    @db.name.should == Mordor::Config[:database]
   end
 end
