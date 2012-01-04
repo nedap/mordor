@@ -142,9 +142,12 @@ module Mordor
       end
 
       def connection
-        @connection ||= Mordor.connection
+        unless @connection
+          @connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port])
+          @connection.autenticate(Mordor::Config[:username], Mordor::Config[:password]) if Mordor::Config[:username]
+        end
+        @connection.db(Mordor::Config[:database])
       end
-
 
       def find_by_id(id)
         get(id)

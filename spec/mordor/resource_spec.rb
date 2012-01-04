@@ -146,19 +146,15 @@ describe "with respect to resources" do
           end
 
           private
-          def self.do_ensure_indices
-            indices.each do |index|
-              do_ensure_index(index)
-            end
-          end
 
           def self.do_ensure_index(attribute)
             collection.ensure_index( [ [attribute.to_s, index_types[attribute]] ] )
           end
 
           def self.ensure_indices
-            self.ensure_count = self.ensure_count + 1
-            self.do_ensure_indices
+            indices.each do |index|
+              ensure_index(index)
+            end
           end
 
           def self.ensure_index(attribute)
@@ -173,7 +169,7 @@ describe "with respect to resources" do
       TestResource.create({:first => 'first', :second => 'second', :third => 'third'})
       TestResource.reset_ensure_count
       TestResource.all()
-      TestResource.ensure_count.should == 1
+      TestResource.ensure_count.should == 2  # For each index
     end
 
     it "should call ensure index for each index attribute on creation" do

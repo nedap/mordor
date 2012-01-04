@@ -13,4 +13,14 @@ describe "connecting to mongo" do
   it "should select the correct database" do
     @db.name.should == Mordor::Config[:database]
   end
+
+  it "should be possible to change the configuration" do
+    old_db = Mordor::Config[:database]
+    Mordor::Config.use do |c|
+      c[:database] = 'some_other'
+    end
+
+    Mordor::Config[:database].should == 'some_other'
+    Mordor::Config[:database] = old_db
+  end
 end

@@ -81,12 +81,3 @@ class Time
     end
   end
 end
-
-module Mordor
-  def connection
-    @connection ||= Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port])
-    @connection.autenticate(Mordor::Config[:username], Mordor::Config[:password]) if Mordor::Config[:username]
-    @connection.db(Mordor::Config[:database])
-  end
-  module_function :connection
-end
