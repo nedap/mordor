@@ -161,20 +161,17 @@ module Mordor
         Collection.new(self, perform_collection_find(query, options))
       end
 
-      def find_by_day(day, options = {})
-        case day
-        when DateTime
-          start = day.to_date.to_time
-          end_of_day = (day.to_date + 1).to_time
-        when Date
-          start = day.to_time
-          end_of_day = (day + 1).to_time
-        when Time
-          start = day.to_datetime.to_date.to_time
-          end_of_day = (day.to_date + 1).to_datetime.to_date.to_time
+
+      def find_by_day(value, options = {})
+        if value.is_a?(Hash)
+          raise ArgumentError.new(":value missing from complex query hash") unless value.keys.include?(:value)
+          day = value.delete(:value)
+          query = value.merge(day_to_query(day))
+        else
+          query = day_to_query(value)
         end
-        hash = {:at => {'$gte' => start, '$lt' => end_of_day}}
-        cursor = perform_collection_find({:at => {'$gte' => start, '$lt' => end_of_day}}, options)
+
+        cursor = perform_collection_find(query, options)
         Collection.new(self, cursor)
       end
 
@@ -245,6 +242,29 @@ module Mordor
 
       def index_types
         @index_types ||= {}
+      end
+
+      def day_to_range(day)
+        case day
+        when DateTime
+          start = day.to_date.to_time
+          end_of_day = (day.to_date + 1).to_time
+        when Date
+          start = day.to_time
+          end_of_day = (day + 1).to_time
+        when Time
+          start = day.to_datetime.to_date.to_time
+          end_of_day = (day.to_date + 1).to_datetime.to_date.to_time
+        end
+        [start, end_of_day]
+      end
+
+      def date_range_to_query(range)
+        {:at => {:$gte => range.first, :$lt => range.last}}
+      end
+
+      def day_to_query(day)
+        date_range_to_query( day_to_range(day) )
       end
     end
   end

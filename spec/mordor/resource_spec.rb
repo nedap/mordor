@@ -9,7 +9,8 @@ describe "with respect to resources" do
       attribute :first,  :index => true
       attribute :second, :index => true, :index_type => Mongo::ASCENDING
       attribute :third,  :finder_method => :find_by_third_attribute
-      attribute :at,     :timestamp => true
+      attribute :at
+      attribute :created_at,     :timestamp => true
 
       # Put this in here again to ensure the original method is still here
       class_eval do
@@ -50,7 +51,7 @@ describe "with respect to resources" do
 
   it "should be possible to designate an attribute as a timestamp" do
     TestResource.timestamped_attribute.should_not be_nil
-    TestResource.timestamped_attribute.should == :at
+    TestResource.timestamped_attribute.should == :created_at
   end
 
   it "should only be possible to have one attribute as a timestamp" do
@@ -103,7 +104,7 @@ describe "with respect to resources" do
       end
     end
 
-    it "should correctly replace BSON::Timestampls" do
+    it "should correctly replace BSON::Timestamps" do
       options = {
         "option" => BSON::Timestamp.new(324244, 12)
       }
@@ -117,10 +118,11 @@ describe "with respect to resources" do
     it "should correctly respond to to_hash" do
       resource = TestResource.new({:first => "first", :second => "second", :third => "third"})
       hash = resource.to_hash
-      hash.size.should     == 4
+      hash.size.should     == 5
       hash[:first].should  == "first"
       hash[:second].should == "second"
       hash[:third].should  == "third"
+      hash[:at].should     == ""
     end
 
   end
@@ -309,7 +311,7 @@ describe "with respect to resources" do
     describe "with respect to passing extra query parameters to finder methods" do
       before :each do
         5.times do |i|
-          TestResource.create({:first => "first", :second => "second-#{i}", :third => "third-#{i}"})
+          TestResource.create({:first => "first", :second => "second-#{i}", :third => "third-#{i}", :at => (Date.today).to_time})
         end
       end
 
@@ -318,6 +320,30 @@ describe "with respect to resources" do
         collection.size.should == 5
 
         lambda{ TestResource.find_by_first({:second => "second-2"})}.should raise_error
+      end
+
+      it "should be possible to add extra query clauses to the find_by_day method" do
+        collection = TestResource.find_by_day(Date.today)
+        collection.size.should == 5
+
+        collection = TestResource.find_by_day({:value => Date.today, :second => "second-1"})
+        collection.size.should == 1
+        resource = collection.first
+        resource.first.should == "first"
+        resource.at.should == Date.today.to_time
+      end
+
+      it "should be possible to add more complex query clauses to the find_by_day method" do
+        collection = TestResource.find_by_day(Date.today)
+        collection.size.should == 5
+
+        collection = TestResource.find_by_day({:value => Date.today, :second => {:$in => ["second-1", "second-2"]}})
+        collection.size.should == 2
+        collection.each do |res|
+          res.at.should == Date.today.to_time
+          ["second-1", "second-2"].should include res.second
+        end
+
       end
 
       it "should be possible to add extra query clauses to a finder method" do
