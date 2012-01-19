@@ -161,7 +161,6 @@ module Mordor
         Collection.new(self, perform_collection_find(query, options))
       end
 
-
       def find_by_day(value, options = {})
         if value.is_a?(Hash)
           raise ArgumentError.new(":value missing from complex query hash") unless value.keys.include?(:value)
@@ -254,7 +253,7 @@ module Mordor
           end_of_day = (day + 1).to_time
         when Time
           start = day.to_datetime.to_date.to_time
-          end_of_day = (day.to_date + 1).to_datetime.to_date.to_time
+          end_of_day = (day.to_datetime + 1).to_date.to_time
         end
         [start, end_of_day]
       end

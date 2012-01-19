@@ -124,7 +124,76 @@ describe "with respect to resources" do
       hash[:third].should  == "third"
       hash[:at].should     == ""
     end
+  end
 
+  context "with respect to times and ranges" do
+    context "when DateTime days are given" do
+      it "should return a correct range" do
+        day = DateTime.civil(2012, 1, 19, 10, 0)
+        range = TestResource.send(:day_to_range, day)
+        range.first.should == DateTime.civil(2012, 1, 19).to_time.gmtime
+        range.last.should  == DateTime.civil(2012, 1, 20).to_time.gmtime
+      end
+
+      it "should return an Array of 2 Time objects" do
+        day = DateTime.civil(2012, 1, 19, 10, 0)
+        range = TestResource.send(:day_to_range, day)
+        range.first.should be_a Time
+        range.last.should be_a Time
+      end
+    end
+
+    context "when Date days are given" do
+      it "should return a correct range" do
+        day = Date.parse("2012-1-19")
+        range = TestResource.send(:day_to_range, day)
+        range.first.should == Date.parse("2012-1-19").to_time.gmtime
+        range.last.should  == Date.parse("2012-1-20").to_time.gmtime
+      end
+
+      it "should return an Array of 2 Time objects" do
+        day = Date.parse("2012-1-19")
+        range = TestResource.send(:day_to_range, day)
+        range.first.should be_a Time
+        range.last.should be_a Time
+      end
+    end
+
+    context "when Time days are given" do
+      it "should return a correct range" do
+        day = DateTime.civil(2012, 1, 19, 10, 0).to_time
+        range = TestResource.send(:day_to_range, day)
+        range.first.should == DateTime.civil(2012, 1, 19).to_time.gmtime
+        range.last.should  == DateTime.civil(2012, 1, 20).to_time.gmtime
+      end
+
+      it "should return an Array of 2 Time objects" do
+        day = DateTime.civil(2012, 1, 19, 10, 0).to_time
+        range = TestResource.send(:day_to_range, day)
+        range.first.should be_a Time
+        range.last.should be_a Time
+      end
+    end
+
+    context "when ranges are changed to queries" do
+      before :all do
+        @range = TestResource.send(:day_to_range, DateTime.civil(2012, 1, 19))
+        @query = TestResource.send(:date_range_to_query, @range)
+      end
+
+      it "should scope the query to the 'at' attribute" do
+        @query.size.should == 1
+        @query[:at].should be_a Hash
+      end
+
+      it "should use the first of the range for the greater equal part" do
+        @query[:at][:$gte].should == @range.first
+      end
+
+      it "should use the last of the range for the smaller than part" do
+        @query[:at][:$lt].should == @range.last
+      end
+    end
   end
 
   context "with respect to indices" do
