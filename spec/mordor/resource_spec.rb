@@ -243,6 +243,13 @@ describe "with respect to resources" do
       TestResource.ensure_count.should == 2  # For each index
     end
 
+    it "should call ensure_index on the collection whenever a resource is destroyed" do
+      resource = TestResource.create({:first => 'first', :second => 'second', :third => 'third'})
+      TestResource.reset_ensure_count
+      resource.destroy
+      TestResource.ensure_count.should == 2  # For each index
+    end
+
     it "should call ensure index for each index attribute on creation" do
       TestResource2.class_eval do
         attribute :test_attribute, :index => true
@@ -269,6 +276,35 @@ describe "with respect to resources" do
       res.second.should eql @resource.second
       res.third.should eql @resource.third
       res._id.should eql @resource._id
+    end
+  end
+
+  context "with respect to destroying" do
+    before :each do
+      clean_sheet
+      @resource = TestResource.create({:first => "first", :second => "second", :third => "third"})
+    end
+
+    it "should not create destroyed resources" do
+      @resource.should_not be_destroyed
+    end
+
+    it "should be possible to destroy a resource" do
+      @resource.should_not be_destroyed
+      @resource.destroy
+      @resource.should be_destroyed
+    end
+
+    it "should not be possible to retrieve a resource after it has been destroyed" do
+      @resource.destroy
+      res = TestResource.get(@resource._id)
+      res.should be_nil
+    end
+
+    it "should only destroy the current resource" do
+      resource2 = TestResource.create({:first => "first2", :second => "second2", :third => "third2"})
+      @resource.destroy
+      TestResource.get(resource2._id).should_not be_nil
     end
   end
 

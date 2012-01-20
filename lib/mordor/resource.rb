@@ -114,6 +114,16 @@ module Mordor
       to_hash.merge(:_id => _id).to_json(*args)
     end
 
+    def destroyed?
+      @destroyed ||= false
+    end
+
+    def destroy
+      collection.remove({:_id => _id})
+      self.class.ensure_indices
+      @destroyed = true
+    end
+
     module ClassMethods
       def create(attributes = {})
         resource = self.new(attributes)
