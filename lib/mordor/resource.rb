@@ -120,7 +120,7 @@ module Mordor
 
     def destroy
       collection.remove({:_id => _id})
-      self.class.ensure_indices
+      self.class.send(:ensure_indices)
       @destroyed = true
     end
 
