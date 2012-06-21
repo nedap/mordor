@@ -9,7 +9,7 @@ gem "rake"
 gem "extlib"
 gem "mongo"
 gem "bson"
-gem "bson_ext", :platforms => [:ruby_18, :ruby_19, :rbx]
+gem "bson_ext", :platforms => [:mri, :rbx]
 gem "json"
 
 group :test do
