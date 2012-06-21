@@ -16,11 +16,9 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency('extlib')
   s.add_development_dependency('mongo')
-  s.add_development_dependency('bson_ext')
 
   s.add_runtime_dependency('extlib')
   s.add_runtime_dependency('mongo')
-  s.add_runtime_dependency('bson_ext')
   s.add_runtime_dependency('json')
 
   s.authors  = ['Jan-Willem Koelewijn', 'Dirkjan Bussink']
