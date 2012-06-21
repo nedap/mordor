@@ -1,4 +1,11 @@
+require "rubygems"
+require "bundler"
+
+Bundler.setup
+
 load('tasks/github-gem.rake')
+
+task :default  => :spec
 
 # Register the gem release tasks in the gem namespace
 GithubGem::RakeTasks.new(:gem) do |config|
