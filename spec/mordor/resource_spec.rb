@@ -22,17 +22,17 @@ describe "with respect to resources" do
   end
 
   it "should create accessor methods for all attributes" do
-    ["first", "first=", "second", "second="].each{ |v| TestResource.public_instance_methods.should include(v) }
+    ["first", "first=", "second", "second="].each{ |v| TestResource.public_instance_methods.map{|m| m.to_s}.should include(v) }
   end
 
   it "should create class level finder methods for all attributes" do
     ["find_by_first", "find_by_second"].each do |finder_method|
-      TestResource.methods.should include(finder_method)
+      TestResource.methods.map{|m| m.to_s}.should include(finder_method)
     end
   end
 
   it "should create finder methods with the supplied finder method name" do
-    TestResource.methods.should include "find_by_third_attribute"
+    TestResource.methods.map{|m| m.to_s}.should include "find_by_third_attribute"
   end
 
   it "should ensure indices when the option :index => true is given" do
