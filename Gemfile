@@ -8,7 +8,7 @@ source "http://rubygems.org"
 gem "rake"
 gem "extlib"
 gem "mongo"
-gem "bson"
+gem "bson_ext", :platforms => :ruby
 gem "json"
 
 group :test do
