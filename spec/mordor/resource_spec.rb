@@ -2,7 +2,6 @@ require File.join(File.dirname(__FILE__), '..', '/spec_helper.rb')
 
 describe "with respect to resources" do
   before :each do
-    Object.send(:remove_const, :TestResource) if Object.const_defined?(:TestResource)
     class TestResource
       include Mordor::Resource
 
@@ -19,6 +18,10 @@ describe "with respect to resources" do
         end
       end
     end
+  end
+
+  after :each do
+    drop_db_collections
   end
 
   it "should create accessor methods for all attributes" do
@@ -71,10 +74,6 @@ describe "with respect to resources" do
   end
 
   context "with respect to replacing params" do
-    before :each do
-      clean_sheet
-    end
-
     it "should correctly substitute non-alphanumeric characters in keys with underscores" do
       options = {
         "o*p#t>i_o@n)s" => "test"
@@ -176,7 +175,7 @@ describe "with respect to resources" do
     end
 
     context "when ranges are changed to queries" do
-      before :all do
+      before :each do
         @range = TestResource.send(:day_to_range, DateTime.civil(2012, 1, 19))
         @query = TestResource.send(:date_range_to_query, @range)
       end
@@ -261,7 +260,6 @@ describe "with respect to resources" do
 
   context "with respect to creating" do
     before :each do
-      clean_sheet
       @resource = TestResource.create({:first => "first", :second => "second", :third => "third"})
     end
 
@@ -281,7 +279,6 @@ describe "with respect to resources" do
 
   context "with respect to destroying" do
     before :each do
-      clean_sheet
       @resource = TestResource.create({:first => "first", :second => "second", :third => "third"})
     end
 
@@ -309,10 +306,6 @@ describe "with respect to resources" do
   end
 
   context "with respect to saving and retrieving" do
-    before :each do
-      clean_sheet
-    end
-
     it "should correctly save resources" do
       resource = TestResource.new({:first => "first", :second => "second"})
       resource.save.should be_true
@@ -477,15 +470,13 @@ describe "with respect to resources" do
   end
 
   context "with respect to retrieving by day" do
-    class TestTimedResource
-      include Mordor::Resource
-
-      attribute :first
-      attribute :at
-    end
-
     before :each do
-      clean_sheet
+      class TestTimedResource
+        include Mordor::Resource
+
+        attribute :first
+        attribute :at
+      end
     end
 
     it "should be possible to retrieve a Resource by day" do
@@ -521,11 +512,8 @@ describe "with respect to resources" do
     end
 
     it "should return nil when an non existing id is queried" do
-      clean_sheet
       resource = TestResource.find_by_id('4eb8f3570e02e10cce000002')
       resource.should be_nil
     end
   end
-
-
 end

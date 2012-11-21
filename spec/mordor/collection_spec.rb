@@ -1,18 +1,22 @@
 require File.join(File.dirname(__FILE__), '..', '/spec_helper.rb')
 
 describe "with respect to collections" do
-  class TestResource
-    include Mordor::Resource
+  before :each do
+    class TestResource
+      include Mordor::Resource
 
-    attribute :first,  :index => true
-    attribute :second, :index => true, :index_type => Mongo::ASCENDING
-    attribute :third,  :finder_method => :find_by_third_attribute
+      attribute :first,  :index => true
+      attribute :second, :index => true, :index_type => Mongo::ASCENDING
+      attribute :third,  :finder_method => :find_by_third_attribute
+    end
+  end
+
+  after :each do
+    drop_db_collections
   end
 
   describe "serialization" do
-    before :all do
-      clean_sheet
-
+    before :each do
       5.times do |index|
         res = TestResource.new(:first => "#{index}_first", :second => "#{index}_second", :third => "#{index}_third")
         res.save.should be_true
@@ -33,9 +37,7 @@ describe "with respect to collections" do
   end
 
   describe "converting to array" do
-    before :all do
-      clean_sheet
-
+    before :each do
       5.times do |index|
         res = TestResource.new(:first => "#{index}_first", :second => "#{index}_second", :third => "#{index}_third")
         res.save.should be_true
@@ -73,9 +75,7 @@ describe "with respect to collections" do
 
   describe "counting" do
 
-    before :all do
-      clean_sheet
-
+    before :each do
       5.times do |index|
         res = TestResource.new(:first => "#{index}_first", :second => "#{index}_second", :third => "#{index}_third")
         res.save.should be_true
