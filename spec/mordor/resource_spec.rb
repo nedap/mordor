@@ -500,8 +500,8 @@ describe "with respect to resources" do
       TestResource.collection_name.should == "testresources"
     end
 
-    it "should correctly create a connection" do
-      TestResource.connection.should_not be_nil
+    it "should be connected to a database" do
+      TestResource.database.should_not be_nil
     end
   end
 

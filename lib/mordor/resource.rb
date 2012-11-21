@@ -136,7 +136,7 @@ module Mordor
       end
 
       def collection
-        connection.collection(self.collection_name)
+        database.collection(self.collection_name)
       end
 
       def collection_name
@@ -155,12 +155,14 @@ module Mordor
         end
       end
 
-      def connection
-        unless @connection
-          @connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port])
-          @connection.autenticate(Mordor::Config[:username], Mordor::Config[:password]) if Mordor::Config[:username]
+      def database
+        unless @db
+          connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port])
+          @db = connection.db(Mordor::Config[:database])
+          @db.authenticate(Mordor::Config[:username], Mordor::Config[:password]) if Mordor::Config[:username]
         end
-        @connection.db(Mordor::Config[:database])
+
+        @db
       end
 
       def find_by_id(id)
