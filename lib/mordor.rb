@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'rational'
 require 'mongo'
 require 'extlib'
 require 'json'
