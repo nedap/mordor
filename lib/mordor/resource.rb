@@ -158,7 +158,7 @@ module Mordor
       def database
         unless @db
           if (hosts = Mordor::Config[:hostname].split(",").map{|h| h.strip}).size > 1
-            options = {:refresh_mode => true}
+            options = {:refresh_mode => :sync}
             options[:rs_name] = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
             connection = Mongo::MongoReplicaSetClient.new(hosts, options)
           else
