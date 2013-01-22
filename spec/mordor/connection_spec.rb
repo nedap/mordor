@@ -60,4 +60,37 @@ describe "connecting to mongo" do
       TestResource.database
     end
   end
+
+  describe "replica sets" do
+    before :each do
+      @mock_connection = mock("connection", :db => mock("db"))
+    end
+
+    it "creates a mongo replica set client when multiple hosts are provided" do
+      hosts = "localhost:27017, localhost:27018  "
+      hosts_array = hosts.split(",").map{ |h| h.strip }
+
+      Mordor::Config.use { |config| config[:hostname] = hosts }
+
+      Mongo::MongoReplicaSetClient.should_receive(:new).with(hosts_array, anything).and_return(@mock_connection)
+
+      TestResource.database
+    end
+
+    it "creates a mongo replica set client with the correct replica set name if given" do
+      hosts = "localhost:27017, localhost:27018  "
+      replica_set = "sample replica set"
+
+      Mordor::Config.use do |config|
+        config[:hostname] = hosts
+        config[:replica_set] = replica_set
+      end
+
+      options = {:rs_name => replica_set, :refresh_mode => true}
+
+      Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
+
+      TestResource.database
+    end
+  end
 end

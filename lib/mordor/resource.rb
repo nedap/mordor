@@ -157,7 +157,13 @@ module Mordor
 
       def database
         unless @db
-          connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port])
+          if (hosts = Mordor::Config[:hostname].split(",").map{|h| h.strip}).size > 1
+            options = {:refresh_mode => true}
+            options[:rs_name] = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
+            connection = Mongo::MongoReplicaSetClient.new(hosts, options)
+          else
+            connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port])
+          end
           @db = connection.db(Mordor::Config[:database])
           @db.authenticate(Mordor::Config[:username], Mordor::Config[:password]) if Mordor::Config[:username]
         end
