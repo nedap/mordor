@@ -86,7 +86,7 @@ describe "connecting to mongo" do
         config[:replica_set] = replica_set
       end
 
-      options = {:rs_name => replica_set, :refresh_mode => true}
+      options = {:rs_name => replica_set, :refresh_mode => :sync}
 
       Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
 
