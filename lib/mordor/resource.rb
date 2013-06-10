@@ -81,8 +81,10 @@ module Mordor
           end
           self_hash = ordered_self_hash
         end
-        insert_id = self.class.collection.insert(self_hash)
-        self._id = insert_id
+        with_collection do |collection|
+          insert_id = collection.insert(self_hash)
+          self._id = insert_id
+        end
       else
         insert_id = self.update
       end
@@ -91,8 +93,17 @@ module Mordor
 
     alias_method :save!, :save
 
+    def with_collection
+      self.class.with_collection do |collection|
+        yield collection
+      end
+    end
+
     def update
-      insert_id = self.class.collection.update({:_id => self._id}, self.to_hash)
+      insert_id = nil
+      with_collection do |collection|
+        insert_id = collection.update({:_id => self._id}, self.to_hash)
+      end
       insert_id
     end
 
@@ -136,7 +147,11 @@ module Mordor
       end
 
       def collection
-        database.collection(self.collection_name)
+        collection = nil
+        with_database do |database|
+          collection = database.collection(self.collection_name)
+        end
+        collection
       end
 
       def collection_name
@@ -169,6 +184,24 @@ module Mordor
         end
 
         @db
+      end
+
+      def with_database(max_retries=60)
+        retries = 0
+        begin
+          yield self.database
+        rescue Mongo::ConnectionFailure => ex
+          retries += 1
+          raise ex if retries > max_retries
+          sleep(0.5)
+          retry
+        end
+      end
+
+      def with_collection
+        with_database do |database|
+          yield database.collection(self.collection_name)
+        end
       end
 
       def find_by_id(id)
@@ -250,7 +283,9 @@ module Mordor
       end
 
       def ensure_index(attribute)
-        collection.ensure_index( [ [attribute.to_s, index_types[attribute] ]] )
+        with_collection do |collection|
+          collection.ensure_index( [ [attribute.to_s, index_types[attribute] ]] )
+        end
       end
 
       def indices
