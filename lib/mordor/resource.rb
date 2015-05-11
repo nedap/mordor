@@ -173,11 +173,11 @@ module Mordor
       def database
         unless @db
           if (hosts = Mordor::Config[:hostname].split(",").map{|h| h.strip}).size > 1
-            options = {:refresh_mode => :sync, :pool_size => Mordor::Config[:pool_size], :pool_timeout => Mordor::Config[:pool_timeout]}
+            options = pool_options.merge({:refresh_mode => :sync})
             options[:rs_name] = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
             connection = Mongo::MongoReplicaSetClient.new(hosts, options)
           else
-            connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port], :pool_size => Mordor::Config[:pool_size], :pool_timeout => Mordor::Config[:pool_timeout])
+            connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port], pool_options)
           end
           @db = connection.db(Mordor::Config[:database])
           @db.authenticate(Mordor::Config[:username], Mordor::Config[:password]) if Mordor::Config[:username]
@@ -318,6 +318,11 @@ module Mordor
       def day_to_query(day)
         date_range_to_query( day_to_range(day) )
       end
+
+      def pool_options
+        {:pool_size => Mordor::Config[:pool_size], :pool_timeout => Mordor::Config[:pool_timeout]}
+      end
+      
     end
   end
 end
