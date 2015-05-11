@@ -62,6 +62,7 @@ module Mordor
           :database => 'development',
           :pool_size => 5,
           :pool_timeout => 1,
+          :rs_refresh_mode => :sync,
         }
       end
 
