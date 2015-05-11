@@ -59,7 +59,9 @@ module Mordor
         @defaults ||= {
           :hostname => 'localhost',
           :port     => 27017,
-          :database => 'development'
+          :database => 'development',
+          :pool_size => 5,
+          :pool_timeout => 1,
         }
       end
 
