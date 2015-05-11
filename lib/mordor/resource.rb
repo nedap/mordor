@@ -173,9 +173,7 @@ module Mordor
       def database
         unless @db
           if connecting_to_replica_set?
-            hosts = replica_set_host_list
-            options = replica_set_options
-            connection = Mongo::MongoReplicaSetClient.new(hosts, options)
+            connection = Mongo::MongoReplicaSetClient.new(replica_set_host_list, replica_set_options)
           else
             connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port], pool_options)
           end
