@@ -172,7 +172,8 @@ module Mordor
 
       def database
         unless @db
-          if (hosts = Mordor::Config[:hostname].split(",").map{|h| h.strip}).size > 1
+          if connecting_to_replica_set?
+            hosts = replica_set_host_list
             options = pool_options.merge({:refresh_mode => :sync})
             options[:rs_name] = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
             connection = Mongo::MongoReplicaSetClient.new(hosts, options)
@@ -322,7 +323,15 @@ module Mordor
       def pool_options
         {:pool_size => Mordor::Config[:pool_size], :pool_timeout => Mordor::Config[:pool_timeout]}
       end
-      
+
+      def replica_set_host_list
+        @replica_set_hosts ||= Mordor::Config[:hostname].split(',').map(&:strip)
+      end
+
+      def connecting_to_replica_set?
+        replica_set_host_list.size > 1
+      end
+
     end
   end
 end
