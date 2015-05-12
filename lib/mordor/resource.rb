@@ -173,9 +173,9 @@ module Mordor
       def database
         unless @db
           if connecting_to_replica_set?
-            connection = Mongo::MongoReplicaSetClient.new(replica_set_host_list, replica_set_options)
+            connection = new_replica_set_client
           else
-            connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port], pool_options)
+            connection = new_mongo_connection
           end
           @db = connection.db(Mordor::Config[:database])
           @db.authenticate(Mordor::Config[:username], Mordor::Config[:password]) if Mordor::Config[:username]
@@ -263,7 +263,8 @@ module Mordor
         EOS
       end
 
-      private
+    private
+
       def perform_collection_find(query, options = {})
         ensure_indices
         collection.find(query, options)
@@ -334,6 +335,14 @@ module Mordor
 
       def connecting_to_replica_set?
         replica_set_host_list.size > 1
+      end
+
+      def new_mongo_connection
+        Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port], pool_options)
+      end
+
+      def new_replica_set_client
+        Mongo::MongoReplicaSetClient.new(replica_set_host_list, replica_set_options)
       end
 
     end
