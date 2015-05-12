@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rack-test'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 2.0', '< 2.99'
-  
+
   s.add_runtime_dependency 'bson_ext' unless RUBY_PLATFORM == "java"
   s.extensions << 'ext/mkrf_conf.rb'
 

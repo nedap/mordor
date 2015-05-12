@@ -18,7 +18,7 @@ module Mordor
       #
       # :api: publicdef use
       def use
-        @configuration ||= {}
+        @configuration ||= defaults
         yield @configuration
         nil
       end
@@ -60,8 +60,8 @@ module Mordor
           :hostname => 'localhost',
           :port     => 27017,
           :database => 'development',
-          :pool_size => 5,
-          :pool_timeout => 1,
+          :pool_size => nil,
+          :pool_timeout => nil,
           :rs_refresh_mode => :sync,
         }
       end
