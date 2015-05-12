@@ -318,16 +318,7 @@ module Mordor
         date_range_to_query( day_to_range(day) )
       end
 
-      def pool_options
-        {:pool_size => Mordor::Config[:pool_size], :pool_timeout => Mordor::Config[:pool_timeout]}
-      end
-
-      def replica_set_options
-        Hash.new.tap do |options|
-          options[:refresh_mode] = Mordor::Config[:rs_refresh_mode]
-          options[:rs_name] = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
-        end
-      end
+      # Replica set helpers
 
       def replica_set_host_list
         @replica_set_hosts ||= Mordor::Config[:hostname].split(',').map(&:strip)
@@ -350,11 +341,29 @@ module Mordor
       # Connection arguments
 
       def mongo_connection_args
-        [ Mordor::Config[:hostname], Mordor::Config[:port] ]
+        [ Mordor::Config[:hostname], Mordor::Config[:port] ].tap do |args|
+          args << pool_options unless pool_options.empty?
+        end
       end
 
       def replica_set_client_args
         [ replica_set_host_list, replica_set_options ]
+      end
+
+      # Connection options
+
+      def pool_options
+        @pool_options ||= Hash.new.tap do |options|
+          options[:pool_size]    = Mordor::Config[:pool_size]    if Mordor::Config[:pool_size]
+          options[:pool_timeout] = Mordor::Config[:pool_timeout] if Mordor::Config[:pool_timeout]
+        end
+      end
+
+      def replica_set_options
+        @replica_set_options ||= pool_options.tap do |options|
+          options[:refresh_mode] = Mordor::Config[:rs_refresh_mode]
+          options[:rs_name]      = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
+        end
       end
 
     end
