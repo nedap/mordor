@@ -323,7 +323,7 @@ module Mordor
       end
 
       def replica_set_options
-        pool_options.tap do |options|
+        Hash.new.tap do |options|
           options[:refresh_mode] = Mordor::Config[:rs_refresh_mode]
           options[:rs_name] = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
         end
@@ -337,12 +337,24 @@ module Mordor
         replica_set_host_list.size > 1
       end
 
+      # Connection setup
+
       def new_mongo_connection
-        Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port], pool_options)
+        Mongo::Connection.new(*mongo_connection_args)
       end
 
       def new_replica_set_client
-        Mongo::MongoReplicaSetClient.new(replica_set_host_list, replica_set_options)
+        Mongo::MongoReplicaSetClient.new(*replica_set_client_args)
+      end
+
+      # Connection arguments
+
+      def mongo_connection_args
+        [ Mordor::Config[:hostname], Mordor::Config[:port] ]
+      end
+
+      def replica_set_client_args
+        [ replica_set_host_list, replica_set_options ]
       end
 
     end
