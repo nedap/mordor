@@ -337,7 +337,7 @@ module Mordor
 
       def mongo_connection_args
         [ Mordor::Config[:hostname], Mordor::Config[:port] ].tap do |args|
-          args << pool_options if pool_options.any?
+          args << connection_pool_options if connection_pool_options.any?
         end.compact
       end
 
@@ -353,17 +353,17 @@ module Mordor
 
       # Connection options
 
-      def pool_options
-        @pool_options ||= Hash.new.tap do |options|
-          options[:pool_size]    = Mordor::Config[:pool_size]    if Mordor::Config[:pool_size]
-          options[:pool_timeout] = Mordor::Config[:pool_timeout] if Mordor::Config[:pool_timeout]
+      def connection_pool_options
+        @connection_pool_options ||= Hash.new.tap do |hash|
+          hash[:pool_size]    = Mordor::Config[:pool_size]    if Mordor::Config[:pool_size]
+          hash[:pool_timeout] = Mordor::Config[:pool_timeout] if Mordor::Config[:pool_timeout]
         end
       end
 
       def replica_set_options
-        @replica_set_options ||= pool_options.tap do |options|
-          options[:refresh_mode] = Mordor::Config[:rs_refresh_mode]
-          options[:rs_name]      = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
+        @replica_set_options ||= connection_pool_options.tap do |hash|
+          hash[:refresh_mode] = Mordor::Config[:rs_refresh_mode]
+          hash[:rs_name]      = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
         end
       end
 
