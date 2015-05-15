@@ -91,5 +91,41 @@ describe "connecting to mongo" do
 
       Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
     end
+
+    it "creates a mongo replica set client with specific pool size, if given" do
+      Mordor::Config.use do |config|
+        config[:hostname] = host_string
+        config[:pool_size] = 1
+      end
+
+      options = {:pool_size => 1, :refresh_mode => :sync}
+
+      Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
+    end
+
+    it "creates a mongo replica set client with specific pool timeout, if given" do
+      Mordor::Config.use do |config|
+        config[:hostname] = host_string
+        config[:pool_timeout] = 1
+      end
+
+      options = {:pool_timeout => 1, :refresh_mode => :sync}
+
+      Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
+    end
+
+    it "creates a mongo replica set client with specific pool timeout and size" do
+      Mordor::Config.use do |config|
+        config[:hostname] = host_string
+        config[:pool_size] = 5
+        config[:pool_timeout] = 1
+        config[:replica_set] = replica_set_string
+      end
+
+      options = {:pool_size => 5, :pool_timeout => 1, :refresh_mode => :sync, :rs_name => replica_set_string}
+
+      Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
+    end
+
   end
 end
