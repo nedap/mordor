@@ -1,6 +1,6 @@
 language: ruby
 cache: bundler
-bundler_args: --without development deploy optional
+bundler_args: --without optional
 
 jdk:
   - oraclejdk7
