@@ -44,88 +44,81 @@ describe "connecting to mongo" do
       @mock_connection = double("connection", :db => double("db"))
     end
 
+    after :each do
+      TestResource.database
+    end
+
     it "should connect with specified host" do
       host = "any host IP or reachable hostname"
       Mordor::Config.use { |config| config[:hostname] = host }
-
       Mongo::Connection.should_receive(:new).with(host, anything).and_return(@mock_connection)
-
-      TestResource.database
     end
 
     it "should connect on specified port" do
       port = rand(10000)
       Mordor::Config.use { |config| config[:port] = port }
-
       Mongo::Connection.should_receive(:new).with(anything, port).and_return(@mock_connection)
+    end
 
-      TestResource.database
     end
   end
 
   describe "replica sets" do
     before :each do
       @mock_connection = double("connection", :db => double("db"))
+      Mordor::Config.use { |config| config[:hostname] = host_string }
     end
 
     after :each do
       TestResource.database
     end
 
-    let(:host_string){ "localhost:27017, localhost:27018  " }
-    let(:replica_set_string){ "sample replica set" }
+    let(:host_string){ 'localhost:27017, localhost:27018  ' }
+    let(:hosts_array){ host_string.split(',').map(&:strip)  }
+    let(:replica_set_string){ 'sample replica set' }
 
     it "creates a mongo replica set client when multiple hosts are provided" do
-      hosts_array = host_string.split(",").map{ |h| h.strip }
-      Mordor::Config.use { |config| config[:hostname] = host_string }
-
       Mongo::MongoReplicaSetClient.should_receive(:new).with(hosts_array, anything).and_return(@mock_connection)
     end
 
     it "creates a mongo replica set client with the correct replica set name if given" do
       Mordor::Config.use do |config|
-        config[:hostname] = host_string
         config[:replica_set] = replica_set_string
       end
-
       options = {:rs_name => replica_set_string, :refresh_mode => :sync}
 
       Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
     end
 
-    it "creates a mongo replica set client with specific pool size, if given" do
-      Mordor::Config.use do |config|
-        config[:hostname] = host_string
-        config[:pool_size] = 1
+    describe 'setting connection pool options' do
+      it 'supports setting pool size' do
+        Mordor::Config.use do |config|
+          config[:pool_size] = 1
+        end
+        options = {:pool_size => 1, :refresh_mode => :sync}
+
+        Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
       end
 
-      options = {:pool_size => 1, :refresh_mode => :sync}
+      it 'supports setting pool timeout' do
+        Mordor::Config.use do |config|
+          config[:pool_timeout] = 1
+        end
 
-      Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
-    end
-
-    it "creates a mongo replica set client with specific pool timeout, if given" do
-      Mordor::Config.use do |config|
-        config[:hostname] = host_string
-        config[:pool_timeout] = 1
+        options = {:pool_timeout => 1, :refresh_mode => :sync}
+        Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
       end
 
-      options = {:pool_timeout => 1, :refresh_mode => :sync}
+      it 'supports setting both' do
+        Mordor::Config.use do |config|
+          config[:pool_size] = 5
+          config[:pool_timeout] = 1
+          config[:replica_set] = replica_set_string
+        end
+        options = {:pool_size => 5, :pool_timeout => 1, :refresh_mode => :sync, :rs_name => replica_set_string}
 
-      Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
-    end
-
-    it "creates a mongo replica set client with specific pool timeout and size" do
-      Mordor::Config.use do |config|
-        config[:hostname] = host_string
-        config[:pool_size] = 5
-        config[:pool_timeout] = 1
-        config[:replica_set] = replica_set_string
+        Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
       end
-
-      options = {:pool_size => 5, :pool_timeout => 1, :refresh_mode => :sync, :rs_name => replica_set_string}
-
-      Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
     end
 
   end
