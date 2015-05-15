@@ -27,8 +27,8 @@ describe "connecting to mongo" do
         config[:password] = credentials[:password]
       end
 
-      @mock_db = mock("db")
-      Mongo::Connection.stub(:new).and_return(mock("connection", :db => @mock_db))
+      @mock_db = double("db")
+      Mongo::Connection.stub(:new).and_return(double("connection", :db => @mock_db))
     end
 
     it "should authenticate with username and password" do
@@ -39,7 +39,7 @@ describe "connecting to mongo" do
 
   describe "the Mongo database connection" do
     before :each do
-      @mock_connection = mock("connection", :db => mock("db"))
+      @mock_connection = double("connection", :db => double("db"))
     end
 
     it "should connect with specified host" do
@@ -63,7 +63,7 @@ describe "connecting to mongo" do
 
   describe "replica sets" do
     before :each do
-      @mock_connection = mock("connection", :db => mock("db"))
+      @mock_connection = double("connection", :db => double("db"))
     end
 
     after :each do
