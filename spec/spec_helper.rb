@@ -15,13 +15,7 @@ RSpec.configure do |config|
 end
 
 def reset_mordor_config
-  Mordor::Config.use do |config|
-    config[:username] = nil
-    config[:password] = nil
-    config[:hostname] = '127.0.0.1'
-    config[:port] = 27017
-    config[:database] = 'test'
-  end
+  Mordor::Config.reset
 end
 
 def drop_db_collections

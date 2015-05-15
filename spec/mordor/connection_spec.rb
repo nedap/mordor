@@ -64,7 +64,6 @@ describe "connecting to mongo" do
   describe "replica sets" do
     before :each do
       @mock_connection = mock("connection", :db => mock("db"))
-      Mordor::Config.reset
     end
 
     after :each do
