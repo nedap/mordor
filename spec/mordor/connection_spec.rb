@@ -60,6 +60,24 @@ describe "connecting to mongo" do
       Mongo::Connection.should_receive(:new).with(anything, port).and_return(@mock_connection)
     end
 
+    describe 'setting connection pool options' do
+      it 'supports setting pool size' do
+        Mordor::Config.use { |config| config[:pool_size] = 7 }
+        Mongo::Connection.should_receive(:new).with('localhost', 27017, pool_size: 7).and_return(@mock_connection)
+      end
+
+      it 'supports setting pool timeout' do
+        Mordor::Config.use { |config| config[:pool_timeout] = 8 }
+        Mongo::Connection.should_receive(:new).with('localhost', 27017, pool_timeout: 8).and_return(@mock_connection)
+      end
+
+      it 'supports setting both' do
+        Mordor::Config.use { |config|
+          config[:pool_size] = 9
+          config[:pool_timeout] = 10
+        }
+        Mongo::Connection.should_receive(:new).with('localhost', 27017, pool_size: 9, pool_timeout: 10).and_return(@mock_connection)
+      end
     end
   end
 
