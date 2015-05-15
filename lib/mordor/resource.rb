@@ -172,15 +172,12 @@ module Mordor
 
       def database
         unless @db
-          if (hosts = Mordor::Config[:hostname].split(",").map{|h| h.strip}).size > 1
-            options = {:refresh_mode => :sync}
-            options[:rs_name] = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
-            connection = Mongo::MongoReplicaSetClient.new(hosts, options)
+          if connecting_to_replica_set?
+            client = new_replica_set_client
           else
-            connection = Mongo::Connection.new(Mordor::Config[:hostname], Mordor::Config[:port])
+            client = new_mongo_connection
           end
-          @db = connection.db(Mordor::Config[:database])
-          @db.authenticate(Mordor::Config[:username], Mordor::Config[:password]) if Mordor::Config[:username]
+          @db = database_connection(client)
         end
 
         @db
@@ -265,7 +262,8 @@ module Mordor
         EOS
       end
 
-      private
+    private
+
       def perform_collection_find(query, options = {})
         ensure_indices
         collection.find(query, options)
@@ -318,6 +316,67 @@ module Mordor
       def day_to_query(day)
         date_range_to_query( day_to_range(day) )
       end
+
+      # Connection setup
+
+      def new_mongo_connection
+        Mongo::Connection.new(*mongo_connection_args)
+      end
+
+      def new_replica_set_client
+        Mongo::MongoReplicaSetClient.new(*replica_set_client_args)
+      end
+
+      def database_connection(client)
+        client.db(Mordor::Config[:database]).tap do |db|
+          db.authenticate(*authentication_args) if authentication_args.any?
+        end
+      end
+
+      # Connection arguments
+
+      def mongo_connection_args
+        [ Mordor::Config[:hostname], Mordor::Config[:port] ].tap do |args|
+          args << connection_pool_options if connection_pool_options.any?
+        end.compact
+      end
+
+      def replica_set_client_args
+        [ replica_set_host_list, replica_set_options ]
+      end
+
+      def authentication_args
+        [ Mordor::Config[:username] ].tap do |args|
+          args << Mordor::Config[:password] if Mordor::Config[:password] && args.any?
+        end.compact
+      end
+
+      # Connection options
+
+      def connection_pool_options
+        @connection_pool_options ||= Hash.new.tap do |hash|
+          hash[:pool_size]    = Mordor::Config[:pool_size]    if Mordor::Config[:pool_size]
+          hash[:pool_timeout] = Mordor::Config[:pool_timeout] if Mordor::Config[:pool_timeout]
+        end
+      end
+
+      def replica_set_options
+        @replica_set_options ||= connection_pool_options.tap do |hash|
+          hash[:refresh_mode] = Mordor::Config[:rs_refresh_mode]
+          hash[:rs_name]      = Mordor::Config[:replica_set] if Mordor::Config[:replica_set]
+        end
+      end
+
+      # Replica set helpers
+
+      def replica_set_host_list
+        @replica_set_hosts ||= Mordor::Config[:hostname].split(',').map(&:strip).compact
+      end
+
+      def connecting_to_replica_set?
+        replica_set_host_list.size > 1
+      end
+
     end
   end
 end

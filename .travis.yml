@@ -1,4 +1,6 @@
 language: ruby
+cache: bundler
+bundler_args: --without optional
 
 jdk:
   - oraclejdk7
@@ -13,7 +15,7 @@ rvm:
   - jruby-19mode
   - rbx-19mode
   - rbx-2.5.3
-  
+
 matrix:
   allow_failures:
     - rvm: rbx-19mode

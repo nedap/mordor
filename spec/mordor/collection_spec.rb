@@ -19,7 +19,7 @@ describe "with respect to collections" do
     before :each do
       5.times do |index|
         res = TestResource.new(:first => "#{index}_first", :second => "#{index}_second", :third => "#{index}_third")
-        res.save.should be_true
+        res.save.should be true
       end
     end
 
@@ -40,7 +40,7 @@ describe "with respect to collections" do
     before :each do
       5.times do |index|
         res = TestResource.new(:first => "#{index}_first", :second => "#{index}_second", :third => "#{index}_third")
-        res.save.should be_true
+        res.save.should be true
       end
     end
 
@@ -78,7 +78,7 @@ describe "with respect to collections" do
     before :each do
       5.times do |index|
         res = TestResource.new(:first => "#{index}_first", :second => "#{index}_second", :third => "#{index}_third")
-        res.save.should be_true
+        res.save.should be true
       end
     end
 

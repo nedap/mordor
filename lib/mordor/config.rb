@@ -18,9 +18,15 @@ module Mordor
       #
       # :api: publicdef use
       def use
-        @configuration ||= {}
+        @configuration ||= defaults
         yield @configuration
         nil
+      end
+
+      # Resets the configuration to its default state
+      #
+      def reset
+        setup
       end
 
       # Retrieve the value of a config entry.
@@ -59,7 +65,10 @@ module Mordor
         @defaults ||= {
           :hostname => 'localhost',
           :port     => 27017,
-          :database => 'development'
+          :database => 'development',
+          :pool_size => nil,
+          :pool_timeout => nil,
+          :rs_refresh_mode => :sync,
         }
       end
 
