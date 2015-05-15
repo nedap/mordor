@@ -7,15 +7,17 @@ describe "connecting to mongo" do
     end
   end
 
-  it "should have a mongo database " do
-    TestResource.database.should be_instance_of(Mongo::DB)
-  end
+  describe 'database connection' do
+    it "should have a mongo database " do
+      TestResource.database.should be_instance_of(Mongo::DB)
+    end
 
-  it "should select the correct database" do
-    database_name = "any_database_name"
-    Mordor::Config.use { |config| config[:database] = database_name }
+    it "should select the correct database" do
+      database_name = "any_database_name"
+      Mordor::Config.use { |config| config[:database] = database_name }
 
-    TestResource.database.name.should == database_name
+      TestResource.database.name.should == database_name
+    end
   end
 
   describe "when credentials are provided" do
