@@ -135,7 +135,7 @@ module GithubGem
 
         desc "Release a new version of the gem using the VERSION environment variable"
         task(:release => release_tasks) { release_task }
-        
+
         namespace(:release) do
           desc "Release the next version of the gem, by incrementing the last version segment by 1"
           task(:next => [:next_version] + release_tasks) { release_task }
@@ -161,7 +161,7 @@ module GithubGem
         task(:next_patch_version)  { next_version_task(:patch) }
         task(:next_minor_version) { next_version_task(:minor) }
         task(:next_major_version) { next_version_task(:major) }
-        
+
         desc "Updates the gem release tasks with the latest version on Github"
         task(:update_tasks) { update_tasks_task }
       end
@@ -198,11 +198,11 @@ module GithubGem
         when :major then 0
         else next_version.length - 1
       end
-      
+
       next_version[increment_index] ||= 0
       next_version[increment_index] = next_version[increment_index].succ
       ((increment_index + 1)...next_version.length).each { |i| next_version[i] = 0 }
-      
+
       Gem::Version.new(next_version.join('.'))
     end
 
@@ -258,7 +258,7 @@ module GithubGem
 
     # Adds a tag for the released version
     def tag_version_task
-      sh git, 'tag', '-a', "#{gemspec.name}-#{gemspec.version}", '-m', "Released #{gemspec.name} gem version #{gemspec.version}."
+      sh git, 'tag', '-a', "v#{gemspec.version}", '-m', "Released #{gemspec.name} gem version #{gemspec.version}."
     end
 
     # Pushes the changes and tag to github
@@ -334,7 +334,7 @@ module GithubGem
 
         # Reload the gemspec so the changes are incorporated
         load_gemspec!
-        
+
         # Also mark the Gemfile.lock file as changed because of the new version.
         modified_files << 'Gemfile.lock' if File.exist?(File.join(root_dir, 'Gemfile.lock'))
       end
@@ -344,7 +344,7 @@ module GithubGem
     def update_tasks_task
       require 'net/https'
       require 'uri'
-      
+
       uri = URI.parse('https://raw.github.com/wvanbergen/github-gem/master/tasks/github-gem.rake')
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
