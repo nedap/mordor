@@ -67,31 +67,29 @@ describe "connecting to mongo" do
       Mordor::Config.reset
     end
 
-    it "creates a mongo replica set client when multiple hosts are provided" do
-      hosts = "localhost:27017, localhost:27018  "
-      hosts_array = hosts.split(",").map{ |h| h.strip }
-
-      Mordor::Config.use { |config| config[:hostname] = hosts }
-
-      Mongo::MongoReplicaSetClient.should_receive(:new).with(hosts_array, anything).and_return(@mock_connection)
-
+    after :each do
       TestResource.database
     end
 
-    it "creates a mongo replica set client with the correct replica set name if given" do
-      hosts = "localhost:27017, localhost:27018  "
-      replica_set = "sample replica set"
+    let(:host_string){ "localhost:27017, localhost:27018  " }
+    let(:replica_set_string){ "sample replica set" }
 
+    it "creates a mongo replica set client when multiple hosts are provided" do
+      hosts_array = host_string.split(",").map{ |h| h.strip }
+      Mordor::Config.use { |config| config[:hostname] = host_string }
+
+      Mongo::MongoReplicaSetClient.should_receive(:new).with(hosts_array, anything).and_return(@mock_connection)
+    end
+
+    it "creates a mongo replica set client with the correct replica set name if given" do
       Mordor::Config.use do |config|
-        config[:hostname] = hosts
-        config[:replica_set] = replica_set
+        config[:hostname] = host_string
+        config[:replica_set] = replica_set_string
       end
 
-      options = {:rs_name => replica_set, :refresh_mode => :sync}
+      options = {:rs_name => replica_set_string, :refresh_mode => :sync}
 
       Mongo::MongoReplicaSetClient.should_receive(:new).with(anything, options).and_return(@mock_connection)
-
-      TestResource.database
     end
   end
 end
