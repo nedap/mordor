@@ -23,6 +23,12 @@ module Mordor
         nil
       end
 
+      # Resets the configuration to its default state
+      #
+      def reset
+        setup
+      end
+
       # Retrieve the value of a config entry.
       #
       # ==== Parameters

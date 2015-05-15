@@ -64,6 +64,7 @@ describe "connecting to mongo" do
   describe "replica sets" do
     before :each do
       @mock_connection = mock("connection", :db => mock("db"))
+      Mordor::Config.reset
     end
 
     it "creates a mongo replica set client when multiple hosts are provided" do
