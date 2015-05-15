@@ -45,5 +45,3 @@ end
 def test_class_names
   [:TestResource, :TestResource2, :TestTimedResource]
 end
-
-
