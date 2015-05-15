@@ -2,6 +2,6 @@ source "https://rubygems.org"
 
 gemspec
 
-group :optional, :development do
+group :optional do
   gem 'guard-rspec'
 end
