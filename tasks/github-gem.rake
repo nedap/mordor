@@ -182,7 +182,7 @@ module GithubGem
     def build_task
       sh "gem build -q #{gemspec_file}"
       Dir.mkdir('pkg') unless File.exist?('pkg')
-      sh "mv #{gemspec.name}-#{gemspec.version}.gem pkg/#{gemspec.name}-#{gemspec.version}.gem"
+      sh "mv #{gem_package_filename}.gem pkg/#{gem_package_filename}.gem"
     end
 
     def newest_version
@@ -267,7 +267,7 @@ module GithubGem
     end
 
     def gemcutter_release_task
-      sh "gem", 'push', "pkg/#{gemspec.name}-#{gemspec.version}.gem"
+      sh "gem", 'push', "pkg/#{gem_package_filename}.gem"
     end
 
     # Gem release task.
@@ -287,6 +287,14 @@ module GithubGem
     # Checks whether this project has any unit test files
     def has_tests?
       FileList[test_pattern].any?
+    end
+
+    def gem_package_filename
+      "#{gemspec.name}-#{gemspec.version}#{platform_suffix}"
+    end
+
+    def platform_suffix
+      "-#{gemspec.platform}" unless gemspec.platform == 'ruby'
     end
 
     # Loads the gemspec file
