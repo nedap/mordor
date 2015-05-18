@@ -186,7 +186,7 @@ module GithubGem
     end
 
     def newest_version
-      `#{git} tag`.split("\n").map { |tag| tag.split('-').last }.compact.map { |v| Gem::Version.new(v) }.max || Gem::Version.new('0.0.0')
+      `#{git} tag`.split("\n").map { |tag| tag.split('v').last }.compact.map { |v| Gem::Version.new(v) }.max || Gem::Version.new('0.0.0')
     end
 
     def next_version(increment = nil)
