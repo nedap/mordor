@@ -336,9 +336,9 @@ module Mordor
       # Connection arguments
 
       def mongo_connection_args
-        [ Mordor::Config[:hostname], Mordor::Config[:port] ].tap do |args|
-          args << connection_pool_options if connection_pool_options.any?
-        end.compact
+        args = [ Mordor::Config[:hostname], Mordor::Config[:port] ]
+        args << connection_pool_options if connection_pool_options.any?
+        args
       end
 
       def replica_set_client_args
@@ -346,9 +346,12 @@ module Mordor
       end
 
       def authentication_args
-        [ Mordor::Config[:username] ].tap do |args|
-          args << Mordor::Config[:password] if Mordor::Config[:password] && args.any?
-        end.compact
+        args = []
+        if user_name = Mordor::Config[:username]
+          args << user_name
+          args << Mordor::Config[:password] if Mordor::Config[:password]
+        end
+        args
       end
 
       # Connection options
