@@ -3,7 +3,7 @@ require "bundler"
 
 Bundler.setup
 
-load('tasks/github-gem.rake')
+load('./tasks/github-gem.rake')
 
 task :default  => :spec
 
