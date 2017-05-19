@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'extlib'
   s.add_runtime_dependency 'json'
-  s.add_runtime_dependency 'mongo'
+  s.add_runtime_dependency 'mongo', '< 2.0'
 
   s.add_development_dependency 'rack-test'
   s.add_development_dependency 'rake', '< 11.0'
