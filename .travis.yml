@@ -12,9 +12,17 @@ rvm:
   - 1.9.3
   - 2.1.6
   - 2.2.2
+  - 2.2.5
   - jruby-19mode
   - rbx-19mode
   - rbx-2.5.3
+
+addons:
+  apt:
+    source:
+      - mongodb-3.4-precise
+    packages:
+      - mongodb-org-server
 
 matrix:
   allow_failures:
