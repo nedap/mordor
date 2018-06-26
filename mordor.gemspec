@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.homepage = 'http://www.nedap.com'
 
   s.add_runtime_dependency 'extlib'
-  s.add_runtime_dependency 'json'
+  s.add_runtime_dependency 'json', '~> 1.8.5'
   s.add_runtime_dependency 'mongo', '< 2.0'
 
   s.add_development_dependency 'rack-test'
