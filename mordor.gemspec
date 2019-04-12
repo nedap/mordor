@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.authors  = ['Jan-Willem Koelewijn', 'Dirkjan Bussink']
   s.email    = ['janwillem.koelewijn@nedap.com', 'dirkjan.bussink@nedap.com']
-  s.homepage = 'http://www.nedap.com'
+  s.homepage = 'http://github.com/jwkoelewijn/mordor/'
 
   s.add_runtime_dependency 'extlib'
   s.add_runtime_dependency 'json', '~> 1.8.5'
