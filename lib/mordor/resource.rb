@@ -235,7 +235,6 @@ module Mordor
         if options[:index]
           @indices    << name unless @indices.include?(name)
           @index_types[name] = options[:index_type] ? options[:index_type] : Mongo::DESCENDING
-          ensure_index(name)
         end
 
         if options[:timestamp]

@@ -249,12 +249,12 @@ describe "with respect to resources" do
       TestResource.ensure_count.should == 2  # For each index
     end
 
-    it "should call ensure index for each index attribute on creation" do
+    it "should not call ensure index for each index attribute on file eval" do
       TestResource2.class_eval do
         attribute :test_attribute, :index => true
       end
 
-      TestResource2.ensure_count.should == 1
+      TestResource2.ensure_count.should == 0
     end
   end
 
