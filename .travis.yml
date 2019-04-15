@@ -1,35 +1,11 @@
 sudo: false
+
 language: ruby
+rvm:
+  - 2.6.2
+  - 2.4.6
+
 cache: bundler
-bundler_args: --without optional
-
-jdk:
-  - oraclejdk7
-
-env:
-  global:
-    - MONGODB_VERSION=3.4.4
 
 services:
-  - docker
   - mongodb
-
-before_install:
-  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-$MONGODB_VERSION.tgz
-  - tar xfz mongodb-linux-x86_64-$MONGODB_VERSION.tgz
-  - export PATH=`pwd`/mongodb-linux-x86_64-$MONGODB_VERSION/bin:$PATH
-  - mkdir -p data/db
-  - mongod --dbpath=data/db &
-  - sleep 3
-
-#rvm:
-#  - 2.2.2
-#  - 2.2.5
-#  - jruby-19mode
-#  - rbx-19mode
-#  - rbx-2.5.3
-#
-#matrix:
-#  allow_failures:
-#    - rvm: rbx-19mode
-#    - rvm: rbx-2.5.3
