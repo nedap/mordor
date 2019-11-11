@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.name    = 'mordor'
 
   # Do not set the version and date field manually, this is done by the release script
-  s.version = "0.3.3"
+  s.version = "0.3.4"
   s.date    = "2019-04-15"
 
   s.summary     = 'mordor'
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'rake', '< 11.0'
   s.add_development_dependency 'rspec', '~> 2.0', '< 2.99'
+  s.add_development_dependency 'rspec_junit_formatter'
 
   s.extensions << 'ext/mkrf_conf.rb'
 
@@ -35,5 +36,5 @@ Gem::Specification.new do |s|
 
   # The files and test_files directives are set automatically by the release script.
   # Do not change them by hand, but make sure to add the files to the git repository.
-  s.files = %w(.gitignore .travis.yml CHANGES.md Gemfile Guardfile LICENSE README.md Rakefile ext/mkrf_conf.rb lib/mordor.rb lib/mordor/collection.rb lib/mordor/config.rb lib/mordor/resource.rb lib/mordor/version.rb mordor.gemspec spec/mordor/collection_spec.rb spec/mordor/connection_spec.rb spec/mordor/resource_spec.rb spec/spec.opts spec/spec_helper.rb tasks/github-gem.rake)
+  s.files = %w(.gitignore CHANGES.md Gemfile Guardfile LICENSE README.md Rakefile ext/mkrf_conf.rb lib/mordor.rb lib/mordor/collection.rb lib/mordor/config.rb lib/mordor/resource.rb lib/mordor/version.rb mordor.gemspec spec/mordor/collection_spec.rb spec/mordor/connection_spec.rb spec/mordor/resource_spec.rb spec/spec.opts spec/spec_helper.rb tasks/github-gem.rake .circleci/config.yml)
 end
