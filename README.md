@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/jwkoelewijn/mordor.png?branch=master)](http://travis-ci.org/jwkoelewijn/mordor)
+[![CircleCI](https://circleci.com/gh/nedap/mordor/tree/master.svg?style=svg)](https://circleci.com/gh/nedap/mordor/tree/master)
 
 ## Introduction
 Small library to add DataMapper style resources for MongoDB.
