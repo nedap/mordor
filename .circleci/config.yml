@@ -45,7 +45,7 @@ jobs:
 
   rubygems_release:
     docker: 
-      - image: circleci/ruby:2.4.5
+      - image: circleci/ruby:2.6.5
 
     working_directory: ~/repo
 
