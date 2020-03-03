@@ -3,6 +3,13 @@ require "bundler"
 
 Bundler.setup
 
+module TempFixForRakeLastComment
+  def last_comment
+    last_description
+  end 
+end
+Rake::Application.send :include, TempFixForRakeLastComment
+
 load('./tasks/github-gem.rake')
 
 task :default  => :spec

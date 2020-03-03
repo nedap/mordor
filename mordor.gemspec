@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'rack-test'
   s.add_development_dependency 'guard-rspec'
-  s.add_development_dependency 'rake', '< 11.0'
+  s.add_development_dependency 'rake', '~> 12.3.3'
   s.add_development_dependency 'rspec', '~> 2.0', '< 2.99'
   s.add_development_dependency 'rspec_junit_formatter'
 
