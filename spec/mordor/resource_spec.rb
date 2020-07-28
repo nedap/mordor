@@ -95,7 +95,7 @@ describe "with respect to resources" do
 
     it "should correctly replace BigDecimals" do
       options = {
-        "option" => BigDecimal.new("1.00")
+        "option" => BigDecimal("1.00")
       }
       result = TestResource.new.replace_params(options)
       result.each do |k,v|
