@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.name    = 'mordor'
 
   # Do not set the version and date field manually, this is done by the release script
-  s.version = "0.3.4"
-  s.date    = "2019-04-15"
+  s.version = "0.3.5"
+  s.date    = "2020-07-28"
 
   s.summary     = 'mordor'
   s.description = <<-eos
@@ -36,5 +36,5 @@ Gem::Specification.new do |s|
 
   # The files and test_files directives are set automatically by the release script.
   # Do not change them by hand, but make sure to add the files to the git repository.
-  s.files = %w(.gitignore CHANGES.md Gemfile Guardfile LICENSE README.md Rakefile ext/mkrf_conf.rb lib/mordor.rb lib/mordor/collection.rb lib/mordor/config.rb lib/mordor/resource.rb lib/mordor/version.rb mordor.gemspec spec/mordor/collection_spec.rb spec/mordor/connection_spec.rb spec/mordor/resource_spec.rb spec/spec.opts spec/spec_helper.rb tasks/github-gem.rake .circleci/config.yml)
+  s.files = %w(.circleci/config.yml .gitignore CHANGES.md Gemfile Guardfile LICENSE README.md Rakefile ext/mkrf_conf.rb lib/mordor.rb lib/mordor/collection.rb lib/mordor/config.rb lib/mordor/resource.rb lib/mordor/version.rb mordor.gemspec spec/mordor/collection_spec.rb spec/mordor/connection_spec.rb spec/mordor/resource_spec.rb spec/spec.opts spec/spec_helper.rb tasks/github-gem.rake)
 end
